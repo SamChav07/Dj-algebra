@@ -1,0 +1,8 @@
+# Ignorar el entorno virtual de Python
+algebraLineal/lib/
+algebraLineal/bin/
+algebraLineal/include/
+algebraLineal/share/
+*.pyc
+__pycache__/
+.DS_Store
