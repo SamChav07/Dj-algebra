@@ -1,14 +1,19 @@
 from django.db import models
 
+from django.db import models
+
 class Elim_Gauss(models.Model):
-    EG_NmEcuaciones = models.IntegerField()#Filas Y
-    EG_NmIncognitas = models.IntegerField() #Columnas X
-    EG_valor = models.FloatField() 
+    EG_ecuaciones = models.IntegerField()  # Número de filas
+    EG_incognitas = models.IntegerField()  # Número de columnas
+    EG_fila = models.IntegerField()  # Fila del valor
+    EG_columna = models.IntegerField()  # Columna del valor
+    EG_valor = models.FloatField()  # Valor individual
+
     class Meta:
-        unique_together = ('EG_NmEcuaciones', 'EG_NmIncognitas')
-        #Asegura que no haya duplicados para la misma celda
+        unique_together = ('EG_fila', 'EG_columna')  # Asegura que no haya duplicados para la misma celda en la matriz
+
     def __str__(self):
-        return f"({self.EG_NmEcuaciones}, {self.EG_NmIncognitas}): {self.EG_valor}"
+        return f"({self.EG_fila}, {self.EG_columna}): {self.EG_valor}"  # Formato deseado
 
 class Ope_combinadas(models.Model):
     OpV_NmVectores = models.IntegerField()# Columnas X
