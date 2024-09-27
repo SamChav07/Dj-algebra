@@ -2,7 +2,12 @@ from django.db import models
 
 from django.db import models
 
+class EG_Table(models.Model):
+    tb_filas = models.IntegerField()
+    tb_columnas = models.IntegerField()
+
 class Elim_Gauss(models.Model):
+    EG_tabla = models.ForeignKey(EG_Table, on_delete=models.CASCADE, related_name='elim_gauss')
     EG_ecuaciones = models.IntegerField()  # Número de filas
     EG_incognitas = models.IntegerField()  # Número de columnas
     EG_fila = models.IntegerField()  # Fila del valor
@@ -10,7 +15,7 @@ class Elim_Gauss(models.Model):
     EG_valor = models.FloatField()  # Valor individual
 
     class Meta:
-        unique_together = ('EG_fila', 'EG_columna')  # Asegura que no haya duplicados para la misma celda en la matriz
+        unique_together = ('EG_tabla' ,'EG_fila', 'EG_columna')  # Asegura que no haya duplicados para la misma celda en la matriz
 
     def __str__(self):
         return f"({self.EG_fila}, {self.EG_columna}): {self.EG_valor}"  # Formato deseado
