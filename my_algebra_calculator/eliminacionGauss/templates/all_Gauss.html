@@ -48,8 +48,11 @@
                     <input type="hidden" name="filas" id="filasInput">
                     <input type="hidden" name="columnas" id="columnasInput">
 
-                    <!-- Botón "Resolver", inicialmente oculto -->
-                    <button type="submit" id="resolveBtn" class="btn btn-primary btn-lg w-100 mt-3" style="display:none;">Resolver</button> 
+                        {% csrf_token %}
+                        <input type="hidden" name="eg_table_id" value="1">  <!-- El ID de la tabla -->
+                        <!-- Textarea oculto para enviar los datos de la matriz en formato JSON -->
+                        <textarea name="matriz" style="display:none;"></textarea>
+                        <button type="submit">Guardar y Resolver</button>
 
                 </form>
             </div>

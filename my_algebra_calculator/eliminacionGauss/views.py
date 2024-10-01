@@ -1,41 +1,42 @@
+# eliminacionGauss/views.py
+
 from django.shortcuts import render
 from django.http import JsonResponse
-from eliminacionGauss.models import * #importa todos los modelos Elim_Gauss - Ope_combinadas 
-                                        # MltFC_horizontal - MltFC_vertical
-from eliminacionGauss.logic.matriz import Matriz
-from eliminacionGauss.forms import MatrixForm
-#Se puede intentar acceder a un objeto que no existe_Se usa un bloque try-except para manejar el DoesNotExist
+from django.views.decorators.http import require_POST
+from .models import Elim_Gauss
+from .forms import ElimGaussForm  # Asegúrate de importar tu formulario correctamente
+import json
 
 def main_view(request):
     return render(request, 'main.html')
 
-def resolver_matriz_view(request):
-    if request.method == 'POST':
-        # Supongamos que recibes la matriz desde un formulario o desde otro proceso
-        matriz_datos = request.POST.get('matriz')  # Esto puede variar según cómo obtienes los datos
-        eg_table_id = request.POST.get('eg_table_id')
+@require_POST  # Asegura que solo se acepten solicitudes POST para esta vista
+def all_gauss_view(request):
+    form = ElimGaussForm(request.POST)  # Utiliza el formulario para manejar los datos
 
-        # Guardar cada valor en la tabla Elim_Gauss
-        for fila_idx, fila in enumerate(matriz_datos):
-            for col_idx, valor in enumerate(fila):
-                Elim_Gauss.objects.create(
-                    EG_tabla_id=eg_table_id,
-                    EG_fila=fila_idx + 1,  # Ajustar a índice base 1
-                    EG_columna=col_idx + 1,
-                    EG_valor=valor
-                )
+    if form.is_valid():
+        matriz_datos = form.cleaned_data['EG_matriz']  # Obtiene los datos limpios del formulario
+        eg_table_id = form.cleaned_data['EG_tabla_id']
 
-        # Luego de guardar, llamamos a la clase Matriz para resolver el sistema
         try:
-            matriz = Matriz(eg_table_id)  # Crea la instancia con el ID de la tabla
-            resultado = matriz.eliminacion_gaussiana()  # Resuelve la matriz
+            # Guardar la matriz completa en la tabla Elim_Gauss
+            elim_gauss_instance = Elim_Gauss.objects.create(
+                EG_matriz=json.loads(matriz_datos),  # Asegúrate de que los datos sean válidos JSON
+                EG_tabla_id=eg_table_id,
+            )
+
+            # Realizar la eliminación gaussiana utilizando la matriz almacenada
+            resultado = eliminacion_gaussiana(elim_gauss_instance.EG_matriz)
+
+            # Actualiza el resultado en la base de datos
+            elim_gauss_instance.EG_resultado = resultado
+            elim_gauss_instance.save()
+
             return render(request, 'all_Gauss.html', {'resultado': resultado})
 
-        except ValueError as e:
-            # Si hay un error, mostramos un mensaje
+        except (ValueError, json.JSONDecodeError) as e:
             return render(request, 'error.html', {'error': str(e)})
 
-    # Si no es una petición POST, redirige a otro lado
     return render(request, 'all_Gauss.html', {'form': form})
 
 def op_comb_view(request):

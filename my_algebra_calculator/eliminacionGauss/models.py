@@ -3,12 +3,12 @@
 from django.db import models
 
 class Elim_Gauss(models.Model):
-    # Almacenamos la matriz como un JSON
-    EG_matriz = models.JSONField()
-    EG_resultado = models.JSONField(null=True, blank=True)  # Para almacenar el resultado si lo deseas
+    EG_matriz = models.JSONField()  # Almacena la matriz como JSON
+    EG_tabla_id = models.CharField(max_length=100)  # ID de la tabla relacionada
+    EG_resultado = models.JSONField(null=True, blank=True)  # Resultado de la eliminación gaussiana
 
     def __str__(self):
-        return f'Matriz {self.id}'
+        return f"Elim_Gauss {self.id} - Tabla ID: {self.EG_tabla_id}"
 
 class Ope_combinadas(models.Model):
     OpV_NmVectores = models.IntegerField()# Columnas X
