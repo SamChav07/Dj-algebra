@@ -1,25 +1,28 @@
 # eliminacionGauss/logic/matriz.py
 
+from eliminacionGauss.models import Elim_Gauss
+
 class Matriz:
     """Clase que representa una matriz y permite realizar eliminación Gaussiana."""
 
-    def __init__(self, entradas):
-        """Inicializa la matriz con las entradas del usuario."""
-        if not entradas:
-            raise ValueError("La lista de entradas está vacía.")
-        self.matriz = self.obtener_matriz(entradas)  # Obtener la matriz desde las entradas
+    def __init__(self, eg_table_id):
+        """Inicializa la matriz obteniendo los datos desde la base de datos usando el ID de la tabla."""
+        entradas = Elim_Gauss.objects.filter(EG_tabla_id=eg_table_id)
+        if not entradas.exists():
+            raise ValueError("No hay entradas en la base de datos para esta tabla.")
+        self.matriz = self.obtener_matriz(entradas)
 
     def obtener_matriz(self, entradas):
         """Convierte las entradas (instancias de Elim_Gauss) en una matriz."""
         try:
-            # Crear una matriz vacía con dimensiones adecuadas
-            max_row = max(entry.EG_NmEcuaciones for entry in entradas)
-            max_col = max(entry.EG_NmIncognitas for entry in entradas)
+            max_row = max(entry.EG_fila for entry in entradas)
+            max_col = max(entry.EG_columna for entry in entradas)
             matriz = [[0.0 for _ in range(max_col)] for _ in range(max_row)]
             
+            # Rellenar la matriz con los valores de las entradas
             for entry in entradas:
-                fila = entry.EG_NmEcuaciones - 1  # Ajustar a índice base 0
-                columna = entry.EG_NmIncognitas - 1  # Ajustar a índice base 0
+                fila = entry.EG_fila - 1  # Ajustar a índice base 0
+                columna = entry.EG_columna - 1  # Ajustar a índice base 0
                 matriz[fila][columna] = float(entry.EG_valor)  # Asignar el valor correspondiente
             
             return matriz
@@ -151,3 +154,4 @@ class Matriz:
         resultado += f"\nLas columnas pivote son: {', '.join(map(str, columnas_pivote))}.\n"
 
         return resultado
+        print(resultado)

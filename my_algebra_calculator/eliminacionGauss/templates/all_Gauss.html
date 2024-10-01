@@ -27,36 +27,37 @@
 
         <div class="row">
             <div class="col-md-6">
-                <div class="mb-3">
-                    <label for="ecuaciones" class="form-label">Ecuaciones:</label>
-                    <input type="number" class="form-control" id="ecuaciones" placeholder="Número de ecuaciones" min="1">
-                </div>
-                <div class="mb-3">
-                    <label for="incognitas" class="form-label">Incógnitas:</label>
-                    <input type="number" class="form-control" id="incognitas" placeholder="Número de incógnitas" min="1">
-                </div>
-
-                <button id="createMatrixBtn" class="btn btn-primary btn-lg w-100">Crear Matriz</button>
-
-                <!-- Contenedor para mostrar la matriz -->
-                <div id="matrixContainer" class="matrix-container mt-4"></div>
-
-                <!-- Formulario para enviar datos -->
-                <form id="resolverForm" method="post" action="{% url 'all_gauss_view' %}" style="display:none;">
+                <!-- Formulario para ingresar dimensiones de la matriz -->
+                <form id="resolverForm" method="post" action="{% url 'all_gauss_view' %}">
                     {% csrf_token %}
+                    <div class="mb-3">
+                        {{ form.filas.label }}  <!-- Etiqueta del campo de filas -->
+                        {{ form.filas }}  <!-- Campo de filas -->
+                    </div>
+                    <div class="mb-3">
+                        {{ form.columnas.label }}  <!-- Etiqueta del campo de columnas -->
+                        {{ form.columnas }}  <!-- Campo de columnas -->
+                    </div>
+
+                    <button type="button" id="createMatrixBtn" class="btn btn-primary btn-lg w-100">Crear Matriz</button>
+
+                    <!-- Contenedor para mostrar la matriz -->
+                    <div id="matrixContainer" class="matrix-container mt-4"></div>
+
+                    <!-- Inputs ocultos para enviar datos de la matriz -->
                     <input type="hidden" name="filas" id="filasInput">
                     <input type="hidden" name="columnas" id="columnasInput">
-                    <!-- Este contenedor se llenará con los inputs de valores -->
-                    <div id="inputValuesContainer"></div> 
+
                     <!-- Botón "Resolver", inicialmente oculto -->
-                    <button type="submit" id="resolveBtn" class="btn btn-primary btn-lg w-100 mt-3">Resolver</button> 
+                    <button type="submit" id="resolveBtn" class="btn btn-primary btn-lg w-100 mt-3" style="display:none;">Resolver</button> 
+
                 </form>
             </div>
 
             <div class="col-md-6">
                 <div class="result-container">
                     <h2>Resultados</h2>
-                    <p>Aquí aparecerán los resultados.</p>
+                    <pre id="resultText">Aquí aparecerán los resultados.</pre> <!-- Cambiado a <pre> para formato -->
                 </div>
             </div>
         </div>

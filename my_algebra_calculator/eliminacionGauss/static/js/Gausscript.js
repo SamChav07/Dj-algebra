@@ -1,32 +1,36 @@
 document.addEventListener('DOMContentLoaded', function () {
-
     const createMatrixBtn = document.getElementById('createMatrixBtn');
     const resolverForm = document.getElementById('resolverForm');
     const matrixContainer = document.getElementById('matrixContainer');
+    const resolveBtn = document.getElementById('resolveBtn');
 
-    createMatrixBtn.addEventListener('click', function() {
-        const ecuaciones = parseInt(document.getElementById('ecuaciones').value);
-        const incognitas = parseInt(document.getElementById('incognitas').value);
+    createMatrixBtn.addEventListener('click', function () {
+        const filas = parseInt(document.getElementById('id_filas').value);
+        const columnas = parseInt(document.getElementById('id_columnas').value);
 
         // Limpiar el contenedor de la matriz previo
         matrixContainer.innerHTML = '';
 
         // Validar entradas
-        if (!validarEntradas(ecuaciones, incognitas)) return;
-
-        // Establecer valores ocultos para filas y columnas
-        document.getElementById('filasInput').value = ecuaciones;
-        document.getElementById('columnasInput').value = incognitas;
+        if (!validarEntradas(filas, columnas)) return;
 
         // Crear y mostrar la matriz
-        crearMatriz(ecuaciones, incognitas);
-        resolverForm.style.display = 'block'; // Mostrar formulario
+        crearMatriz(filas, columnas);
+
+        // Mostrar el botón "Resolver"
+        resolveBtn.style.display = 'block';
     });
 
-    resolverForm.addEventListener('submit', async function(event) {
+    resolverForm.addEventListener('submit', async function (event) {
         event.preventDefault();
 
         try {
+            // Convertir los inputs de la matriz en un formato JSON
+            const matriz = obtenerMatriz();
+
+            // Llenar el campo oculto del textarea con la matriz en formato JSON
+            document.querySelector('textarea[name="matriz"]').value = JSON.stringify(matriz);
+
             const formData = new FormData(this);
             const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
 
@@ -42,7 +46,8 @@ document.addEventListener('DOMContentLoaded', function () {
             const data = await response.json();
 
             if (data.status === 'success') {
-                document.querySelector('.result-container p').innerText = data.resultados;
+                alert('Datos guardados exitosamente');
+                document.getElementById('resultText').textContent = data.resultados; // Mostrar resultados
             } else {
                 alert(data.message);
             }
@@ -52,12 +57,12 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 
     // Función para validar las entradas
-    function validarEntradas(ecuaciones, incognitas) {
-        if (isNaN(ecuaciones) || ecuaciones <= 0) {
+    function validarEntradas(filas, columnas) {
+        if (isNaN(filas) || filas <= 0) {
             alert('Por favor, ingresa un número válido de ecuaciones (mayor que 0).');
             return false;
         }
-        if (isNaN(incognitas) || incognitas <= 0) {
+        if (isNaN(columnas) || columnas <= 0) {
             alert('Por favor, ingresa un número válido de incógnitas (mayor que 0).');
             return false;
         }
@@ -89,5 +94,23 @@ document.addEventListener('DOMContentLoaded', function () {
         }
 
         matrixContainer.appendChild(table); // Añadir la tabla al contenedor
+    }
+
+    // Función para obtener la matriz como un array bidimensional
+    function obtenerMatriz() {
+        const filas = parseInt(document.getElementById('id_filas').value);
+        const columnas = parseInt(document.getElementById('id_columnas').value);
+        const matriz = [];
+
+        for (let i = 0; i < filas; i++) {
+            const fila = [];
+            for (let j = 0; j < columnas; j++) {
+                const input = document.querySelector(`input[name="valor_${i + 1}_${j + 1}"]`);
+                fila.push(parseFloat(input.value) || 0); // Agregar el valor o 0 si está vacío
+            }
+            matriz.push(fila);
+        }
+
+        return matriz;
     }
 });
