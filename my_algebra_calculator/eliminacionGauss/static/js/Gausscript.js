@@ -4,67 +4,95 @@ document.addEventListener('DOMContentLoaded', function () {
     const matrixContainer = document.getElementById('matrixContainer');
     const resolveBtn = document.getElementById('resolveBtn');
 
+    // Event listener for creating the matrix
     createMatrixBtn.addEventListener('click', function () {
         const filas = parseInt(document.getElementById('id_filas').value);
         const columnas = parseInt(document.getElementById('id_columnas').value);
 
-        // Limpiar el contenedor de la matriz previo
+        // Clear previous matrix container
         matrixContainer.innerHTML = '';
 
-        // Validar entradas
+        // Validate inputs
         if (!validarEntradas(filas, columnas)) return;
 
-        // Crear y mostrar la matriz
+        // Create and display the matrix
         crearMatriz(filas, columnas);
 
-        // Mostrar el botón "Resolver"
+        // Show the "Resolve" button
         resolveBtn.style.display = 'block';
     });
 
+    // Function to fetch existing table IDs and assign a new one
+    async function fetchNewTableId() {
+        try {
+            const response = await fetch('/get-existing-ids/'); // Use the correct endpoint here
+            if (!response.ok) throw new Error('Network response was not ok');
+
+            const data = await response.json();
+            console.log('Existing IDs:', data.ids);
+
+            // Determine the next available ID (incrementing from max)
+            let newId = data.ids.length > 0 ? Math.max(...data.ids) + 1 : 1;
+
+            return newId;
+        } catch (error) {
+            console.error('Error fetching table IDs:', error);
+            alert('Error al obtener el ID de la tabla.');
+            throw error; // Rethrow error to handle it in submit event
+        }
+    }
+
+    // Event listener for form submission
     resolverForm.addEventListener('submit', async function (event) {
-        event.preventDefault(); // Evitar el envío tradicional del formulario
+        event.preventDefault(); // Prevent traditional form submission
 
         try {
-            // Obtener los datos de las entradas de filas y columnas
+            // Get the number of rows and columns
             const filas = parseInt(document.getElementById('id_filas').value);
             const columnas = parseInt(document.getElementById('id_columnas').value);
 
-            // Convertir los inputs de la matriz en un formato JSON
+            // Convert matrix inputs to JSON format
             const matriz = obtenerMatriz();
 
-            // Obtener el ID de la tabla desde el formulario
-            const egTablaId = document.querySelector('input[name="eg_table_id"]').value; // Referenciar el input oculto
+            // Fetch a new table ID
+            const egTablaId = await fetchNewTableId();
 
-            // Crear un objeto con todos los datos a enviar
+            console.log('New eg_tabla_id:', egTablaId);
+
+            // Prepare data to send
             const datosAEnviar = {
-                EG_tabla_id: egTablaId,
-                ecuaciones: filas,
-                incognitas: columnas,
-                EG_matriz: JSON.stringify(matriz), // Convertir la matriz a string JSON
+                EG_tabla_id: egTablaId,  // Use the newly fetched ID
+                EG_matriz: JSON.stringify(matriz), // Convert matrix to JSON string
             };
 
-            const formData = new URLSearchParams(datosAEnviar); // Formatear los datos para enviar
+            console.log('Datos a enviar:', datosAEnviar);  // Log data being sent
 
-            const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value; // Obtener el token CSRF
+            const formData = new URLSearchParams(datosAEnviar); // Format data for sending
 
-            // Enviar los datos al servidor usando Fetch API
-            const response = await fetch(resolverForm.action, { // Usar la acción del formulario
+            const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value; // Get CSRF token
+
+            // Send data to the server using Fetch API
+            const response = await fetch(resolverForm.action, { 
                 method: 'POST',
                 body: formData,
                 headers: {
-                    'X-Requested-With': 'XMLHttpRequest', // Indicar que es una petición AJAX
-                    'X-CSRFToken': csrftoken // Incluir el token CSRF para seguridad
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'X-CSRFToken': csrftoken 
                 }
             });
 
-            const data = await response.json(); // Parsear la respuesta JSON
+            const data = await response.json(); // Parse JSON response
 
-            // Manejar la respuesta del servidor
+            // Handle server response
             if (data.status === 'success') {
                 alert('Datos guardados exitosamente');
-                document.getElementById('resultText').textContent = data.resultados; // Mostrar resultados
+                document.getElementById('resultText').textContent = data.resultados; // Show results
             } else {
-                alert(data.message); // Mostrar mensaje de error
+                let errorMessage = data.message;
+                if (data.errors) {
+                    errorMessage += '\nErrores específicos:\n' + data.errors.join('\n');
+                }
+                alert(errorMessage); // Show detailed error message
             }
         } catch (error) {
             console.error('Error:', error);
@@ -72,7 +100,7 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     });
 
-    // Función para validar las entradas
+    // Function to validate input entries
     function validarEntradas(filas, columnas) {
         if (isNaN(filas) || filas <= 0) {
             alert('Por favor, ingresa un número válido de ecuaciones (mayor que 0).');
@@ -85,34 +113,34 @@ document.addEventListener('DOMContentLoaded', function () {
         return true;
     }
 
-    // Función para crear la tabla de la matriz
+    // Function to create the matrix table
     function crearMatriz(filas, columnas) {
         const table = document.createElement('table');
-        table.className = 'table table-bordered'; // Clases de Bootstrap para estilo
+        table.className = 'table table-bordered'; 
 
         for (let i = 0; i < filas; i++) {
-            const row = document.createElement('tr'); // Crear fila
+            const row = document.createElement('tr'); 
 
             for (let j = 0; j < columnas; j++) {
-                const cell = document.createElement('td'); // Crear celda
-                const input = document.createElement('input'); // Crear input
+                const cell = document.createElement('td'); 
+                const input = document.createElement('input'); 
 
                 input.type = 'number';
-                input.className = 'form-control'; // Estilo de Bootstrap
-                input.placeholder = `(${i + 1}, ${j + 1})`; // Placeholder
-                input.name = `valor_${i + 1}_${j + 1}`; // Nombre del input
+                input.className = 'form-control'; 
+                input.placeholder = `(${i + 1}, ${j + 1})`; 
+                input.name = `valor_${i + 1}_${j + 1}`; 
 
-                cell.appendChild(input); // Insertar input en la celda
-                row.appendChild(cell); // Insertar celda en la fila
+                cell.appendChild(input); 
+                row.appendChild(cell); 
             }
 
-            table.appendChild(row); // Insertar fila en la tabla
+            table.appendChild(row); 
         }
 
-        matrixContainer.appendChild(table); // Añadir la tabla al contenedor
+        matrixContainer.appendChild(table); 
     }
 
-    // Función para obtener la matriz como un array bidimensional
+    // Function to obtain the matrix as a two-dimensional array
     function obtenerMatriz() {
         const filas = parseInt(document.getElementById('id_filas').value);
         const columnas = parseInt(document.getElementById('id_columnas').value);
@@ -121,8 +149,8 @@ document.addEventListener('DOMContentLoaded', function () {
         for (let i = 0; i < filas; i++) {
             const fila = [];
             for (let j = 0; j < columnas; j++) {
-                const input = document.querySelector(`input[name="valor_${i + 1}_${j + 1}"]`);
-                fila.push(parseFloat(input.value) || 0); // Agregar el valor o 0 si está vacío
+                const input = document.querySelector(`input[name='valor_${i + 1}_${j + 1}']`);
+                fila.push(parseFloat(input.value) || 0); 
             }
             matriz.push(fila);
         }

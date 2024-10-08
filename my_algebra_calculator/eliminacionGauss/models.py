@@ -4,7 +4,7 @@ from django.db import models
 
 class Elim_Gauss(models.Model):
     EG_matriz = models.JSONField()  # Asegúrate de que esta línea esté presente
-    EG_tabla_id = models.CharField(max_length=100)  # ID de la tabla relacionada
+    EG_tabla_id = models.IntegerField()  # ID de la tabla relacionada
     EG_resultado = models.JSONField(null=True, blank=True)  # Resultado de la eliminación gaussiana
     EG_ecuaciones = models.TextField(null=True, blank=True)  # Asegúrate de que esta línea esté presente
 
