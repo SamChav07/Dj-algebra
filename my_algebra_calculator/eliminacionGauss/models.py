@@ -1,19 +1,15 @@
-from django.db import models
+# eliminacionGauss/models.py
 
 from django.db import models
 
 class Elim_Gauss(models.Model):
-    EG_ecuaciones = models.IntegerField()  # Número de filas
-    EG_incognitas = models.IntegerField()  # Número de columnas
-    EG_fila = models.IntegerField()  # Fila del valor
-    EG_columna = models.IntegerField()  # Columna del valor
-    EG_valor = models.FloatField()  # Valor individual
-
-    class Meta:
-        unique_together = ('EG_fila', 'EG_columna')  # Asegura que no haya duplicados para la misma celda en la matriz
+    EG_matriz = models.JSONField()  # Asegúrate de que esta línea esté presente
+    EG_tabla_id = models.IntegerField()  # ID de la tabla relacionada
+    EG_resultado = models.JSONField(null=True, blank=True)  # Resultado de la eliminación gaussiana
+    EG_ecuaciones = models.TextField(null=True, blank=True)  # Asegúrate de que esta línea esté presente
 
     def __str__(self):
-        return f"({self.EG_fila}, {self.EG_columna}): {self.EG_valor}"  # Formato deseado
+        return f"Elim_Gauss {self.id} - Tabla ID: {self.EG_tabla_id}"
 
 class Ope_combinadas(models.Model):
     OpV_NmVectores = models.IntegerField()# Columnas X

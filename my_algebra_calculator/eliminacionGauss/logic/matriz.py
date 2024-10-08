@@ -1,30 +1,19 @@
 # eliminacionGauss/logic/matriz.py
 
+from eliminacionGauss.models import Elim_Gauss
+
 class Matriz:
     """Clase que representa una matriz y permite realizar eliminación Gaussiana."""
 
-    def __init__(self, entradas):
-        """Inicializa la matriz con las entradas del usuario."""
-        if not entradas:
-            raise ValueError("La lista de entradas está vacía.")
-        self.matriz = self.obtener_matriz(entradas)  # Obtener la matriz desde las entradas
-
-    def obtener_matriz(self, entradas):
-        """Convierte las entradas (instancias de Elim_Gauss) en una matriz."""
+    def __init__(self, eg_table_id):
+        """Inicializa la matriz obteniendo los datos desde la base de datos usando el ID de la tabla."""
         try:
-            # Crear una matriz vacía con dimensiones adecuadas
-            max_row = max(entry.EG_NmEcuaciones for entry in entradas)
-            max_col = max(entry.EG_NmIncognitas for entry in entradas)
-            matriz = [[0.0 for _ in range(max_col)] for _ in range(max_row)]
-            
-            for entry in entradas:
-                fila = entry.EG_NmEcuaciones - 1  # Ajustar a índice base 0
-                columna = entry.EG_NmIncognitas - 1  # Ajustar a índice base 0
-                matriz[fila][columna] = float(entry.EG_valor)  # Asignar el valor correspondiente
-            
-            return matriz
+            entrada = Elim_Gauss.objects.get(EG_tabla_id=eg_table_id)
+            self.matriz = entrada.EG_matriz  # Se espera que EG_matriz sea una lista de listas
+        except Elim_Gauss.DoesNotExist:
+            raise ValueError("No hay entradas en la base de datos para esta tabla.")
         except Exception as e:
-            raise ValueError(f"Error al construir la matriz: {str(e)}")
+            raise ValueError(f"Error al obtener la matriz: {str(e)}")
 
     def imprimir_matriz(self, paso, operacion):
         """Genera un string que representa la matriz en un formato legible."""
@@ -119,20 +108,14 @@ class Matriz:
                         coef_str = (
                             f"{int(coef)}" if coef.is_integer() else f"{coef:.2f}"
                         )
-                        if coef < 0:
-                            terminos.append(f"{coef_str}x{k + 1}")
-                        else:
-                            terminos.append(f"+ {coef_str}x{k + 1}")
+                        terminos.append(f"{'+ ' if coef >= 0 else ''}{coef_str}x{k + 1}")
 
                 ecuacion = ""
                 if constante_str != "0":
                     ecuacion += constante_str
 
                 if terminos:
-                    if ecuacion and ecuacion != "0":
-                        ecuacion += " " + " ".join(terminos)
-                    else:
-                        ecuacion = " ".join(terminos).lstrip("+ ").strip() 
+                    ecuacion += " " + " ".join(terminos)
 
                 soluciones[var_name] = f"{var_name} = {ecuacion}".strip()
 
