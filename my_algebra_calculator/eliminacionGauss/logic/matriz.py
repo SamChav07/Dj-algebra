@@ -7,27 +7,13 @@ class Matriz:
 
     def __init__(self, eg_table_id):
         """Inicializa la matriz obteniendo los datos desde la base de datos usando el ID de la tabla."""
-        entradas = Elim_Gauss.objects.filter(EG_tabla_id=eg_table_id)
-        if not entradas.exists():
-            raise ValueError("No hay entradas en la base de datos para esta tabla.")
-        self.matriz = self.obtener_matriz(entradas)
-
-    def obtener_matriz(self, entradas):
-        """Convierte las entradas (instancias de Elim_Gauss) en una matriz."""
         try:
-            max_row = max(entry.EG_fila for entry in entradas)
-            max_col = max(entry.EG_columna for entry in entradas)
-            matriz = [[0.0 for _ in range(max_col)] for _ in range(max_row)]
-            
-            # Rellenar la matriz con los valores de las entradas
-            for entry in entradas:
-                fila = entry.EG_fila - 1  # Ajustar a índice base 0
-                columna = entry.EG_columna - 1  # Ajustar a índice base 0
-                matriz[fila][columna] = float(entry.EG_valor)  # Asignar el valor correspondiente
-            
-            return matriz
+            entrada = Elim_Gauss.objects.get(EG_tabla_id=eg_table_id)
+            self.matriz = entrada.EG_matriz  # Se espera que EG_matriz sea una lista de listas
+        except Elim_Gauss.DoesNotExist:
+            raise ValueError("No hay entradas en la base de datos para esta tabla.")
         except Exception as e:
-            raise ValueError(f"Error al construir la matriz: {str(e)}")
+            raise ValueError(f"Error al obtener la matriz: {str(e)}")
 
     def imprimir_matriz(self, paso, operacion):
         """Genera un string que representa la matriz en un formato legible."""
@@ -122,20 +108,14 @@ class Matriz:
                         coef_str = (
                             f"{int(coef)}" if coef.is_integer() else f"{coef:.2f}"
                         )
-                        if coef < 0:
-                            terminos.append(f"{coef_str}x{k + 1}")
-                        else:
-                            terminos.append(f"+ {coef_str}x{k + 1}")
+                        terminos.append(f"{'+ ' if coef >= 0 else ''}{coef_str}x{k + 1}")
 
                 ecuacion = ""
                 if constante_str != "0":
                     ecuacion += constante_str
 
                 if terminos:
-                    if ecuacion and ecuacion != "0":
-                        ecuacion += " " + " ".join(terminos)
-                    else:
-                        ecuacion = " ".join(terminos).lstrip("+ ").strip() 
+                    ecuacion += " " + " ".join(terminos)
 
                 soluciones[var_name] = f"{var_name} = {ecuacion}".strip()
 
@@ -154,4 +134,3 @@ class Matriz:
         resultado += f"\nLas columnas pivote son: {', '.join(map(str, columnas_pivote))}.\n"
 
         return resultado
-        print(resultado)

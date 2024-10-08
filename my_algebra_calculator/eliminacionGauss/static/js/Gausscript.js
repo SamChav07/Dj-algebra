@@ -22,37 +22,53 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 
     resolverForm.addEventListener('submit', async function (event) {
-        event.preventDefault();
+        event.preventDefault(); // Evitar el envío tradicional del formulario
 
         try {
+            // Obtener los datos de las entradas de filas y columnas
+            const filas = parseInt(document.getElementById('id_filas').value);
+            const columnas = parseInt(document.getElementById('id_columnas').value);
+
             // Convertir los inputs de la matriz en un formato JSON
             const matriz = obtenerMatriz();
 
-            // Llenar el campo oculto del textarea con la matriz en formato JSON
-            document.querySelector('textarea[name="matriz"]').value = JSON.stringify(matriz);
+            // Obtener el ID de la tabla desde el formulario
+            const egTablaId = document.querySelector('input[name="eg_table_id"]').value; // Referenciar el input oculto
 
-            const formData = new FormData(this);
-            const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+            // Crear un objeto con todos los datos a enviar
+            const datosAEnviar = {
+                EG_tabla_id: egTablaId,
+                ecuaciones: filas,
+                incognitas: columnas,
+                EG_matriz: JSON.stringify(matriz), // Convertir la matriz a string JSON
+            };
 
-            const response = await fetch(this.action, {
+            const formData = new URLSearchParams(datosAEnviar); // Formatear los datos para enviar
+
+            const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value; // Obtener el token CSRF
+
+            // Enviar los datos al servidor usando Fetch API
+            const response = await fetch(resolverForm.action, { // Usar la acción del formulario
                 method: 'POST',
                 body: formData,
                 headers: {
-                    'X-Requested-With': 'XMLHttpRequest',
-                    'X-CSRFToken': csrftoken
+                    'X-Requested-With': 'XMLHttpRequest', // Indicar que es una petición AJAX
+                    'X-CSRFToken': csrftoken // Incluir el token CSRF para seguridad
                 }
             });
 
-            const data = await response.json();
+            const data = await response.json(); // Parsear la respuesta JSON
 
+            // Manejar la respuesta del servidor
             if (data.status === 'success') {
                 alert('Datos guardados exitosamente');
                 document.getElementById('resultText').textContent = data.resultados; // Mostrar resultados
             } else {
-                alert(data.message);
+                alert(data.message); // Mostrar mensaje de error
             }
         } catch (error) {
             console.error('Error:', error);
+            alert('Ocurrió un error al enviar los datos.');
         }
     });
 
