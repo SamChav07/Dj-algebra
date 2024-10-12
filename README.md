@@ -41,3 +41,22 @@ Quit the server with CONTROL-C.
 3. Debes de acceder al link por default `http://127.0.0.1:8000/`
 
 > ***|--> Obviamente el servidor se cae una vez detenido. Para detener el servidor local se usa `control + c` o `^C`***
+
+## Tablas
+
+### Método Escalonado
+Input:
+- Ecuaciones Y
+- Variables X
+> ***Se crea una tabla de nY+1 y nX, donde se le suma una columna de resultado de la ecuación.***
+
+### Operaciones Combinadas de Vectores
+Input: 
+- Numero de Vectores X
+- Dimension de vectores Y
+> ***Se crean dos tablas, la primera es de vectores con el numero de vectores nX y componentes(Dimension) nY, la segunda tabla corresponde a los escalares vector nY escalar nX.*** 
+
+### Multiplicación de Vector Fila x Vector Columna
+Input:
+- Dimension del vector Y & X
+> ***Crea dos tablas, la primera una fila nY = 1 y nX(Dimension), la segunda tabla es una columna nX = 1 y nY(Dimension).***
