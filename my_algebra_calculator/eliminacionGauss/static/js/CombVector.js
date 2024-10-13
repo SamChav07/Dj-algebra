@@ -1,31 +1,19 @@
-document.addEventListener('DOMContentLoaded', function () {
+document.addEventListener('DOMContentLoaded', () => {
     const createVectorTableBtn = document.getElementById('createVectorTableBtn');
     const vectorTableContainer = document.getElementById('vectorTableContainer');
     const scalarTableContainer = document.getElementById('scalarTableContainer');
-    const resolveButton = document.getElementById('resolveBtn');
     const inputVector = document.getElementById('OpV_vectores');
     const inputEscalar = document.getElementById('OpV_escalares');
+    const submitAllBtn = document.getElementById('resolveBtn');
     const resolverForm = document.getElementById('resolverForm');
+    const resultText = document.getElementById('resultText');
 
-    // Event listener for creating the tables
-    createVectorTableBtn.addEventListener('click', function () {
+    createVectorTableBtn.addEventListener('click', () => {
         const numVectores = parseInt(document.getElementById('numVectores').value);
         const dimVectores = parseInt(document.getElementById('dimVectores').value);
 
-        // Clear previous tables
         vectorTableContainer.innerHTML = '';
         scalarTableContainer.innerHTML = '';
-
-        // Validate inputs
-        if (isNaN(numVectores) || numVectores <= 0) {
-            alert('Por favor, ingresa un número válido de vectores (mayor que 0).');
-            return;
-        }
-
-        if (isNaN(dimVectores) || dimVectores <= 0) {
-            alert('Por favor, ingresa un número válido para la dimensión (mayor que 0).');
-            return;
-        }
 
         // Create the table for vectors
         const vectorTable = document.createElement('table');
@@ -35,7 +23,8 @@ document.addEventListener('DOMContentLoaded', function () {
         const vectorHeaderRow = document.createElement('tr');
         for (let i = 0; i < numVectores; i++) {
             const th = document.createElement('th');
-            th.textContent = `Vector ${i + 1}`;
+            th.textContent = `Vector ${i + 1}`; // Encabezado "Vector N"
+            th.style.textAlign = 'center';  // Centrar el texto
             vectorHeaderRow.appendChild(th);
         }
         vectorTable.appendChild(vectorHeaderRow);
@@ -48,76 +37,123 @@ document.addEventListener('DOMContentLoaded', function () {
                 const input = document.createElement('input');
                 input.type = 'number';
                 input.className = 'form-control';
-                input.placeholder = `Componente ${i + 1}`;
-                input.dataset.vectorIndex = j; 
-                input.dataset.componentIndex = i; 
-                cell.appendChild(input); 
+                input.placeholder = `Componente ${i + 1}`; // Dentro de la celda, "Componente N"
+                input.dataset.vectorIndex = j;
+                input.dataset.componentIndex = i;
+                cell.appendChild(input);
                 row.appendChild(cell);
             }
             vectorTable.appendChild(row);
         }
 
-        vectorTableContainer.appendChild(vectorTable); 
+        vectorTableContainer.appendChild(vectorTable);
 
-        // Create the table for scalars
+        // Create the table for scalars (without header row)
         const scalarTable = document.createElement('table');
         scalarTable.className = 'table table-bordered'; // Bootstrap classes for styling
 
-        // Create header row for scalars
-        const scalarHeaderRow = document.createElement('tr');
-        for (let j = 0; j < numVectores; j++) {
-            const th = document.createElement('th');
-            th.textContent = `Escalar ${j + 1}`;
-            scalarHeaderRow.appendChild(th);
-        }
-        scalarTable.appendChild(scalarHeaderRow);
-
-        // Create scalar input row
-        const rowEscalars = document.createElement('tr');
+        // Create rows for scalar values
+        const scalarRow = document.createElement('tr');
         for (let j = 0; j < numVectores; j++) {
             const cell = document.createElement('td');
             const input = document.createElement('input');
             input.type = 'number';
             input.className = 'form-control';
-            input.placeholder = `Escalar ${j + 1}`;
-            input.dataset.vectorIndex = j;
-            input.dataset.isScalar = true;
+            input.placeholder = `Escalar ${j + 1}`; // Dentro de la celda, "Escalar N"
+            input.dataset.escalarIndex = j;
             cell.appendChild(input);
-            rowEscalars.appendChild(cell);
+            scalarRow.appendChild(cell);
         }
-        scalarTable.appendChild(rowEscalars);
+        scalarTable.appendChild(scalarRow);
+
         scalarTableContainer.appendChild(scalarTable);
+        submitAllBtn.classList.remove('d-none');
+    });
 
-        // Show the "Resolve" button after creating the tables
-        resolveButton.classList.remove('d-none');
+    submitAllBtn.addEventListener('click', (e) => {
+        e.preventDefault();  // Prevent form from submitting normally
+        const vectores = Array.from(document.querySelectorAll('input[data-vector-index]'))
+            .reduce((acc, input) => {
+                const vectorIndex = input.dataset.vectorIndex;
+                acc[vectorIndex] = acc[vectorIndex] || [];
+                acc[vectorIndex].push(parseFloat(input.value) || 0);
+                return acc;
+            }, []);
 
-        // Handle the action of the "Resolve" button
-        resolveButton.onclick = function () {
-            const vectores = [];
-            const escalares = [];
+        const escalares = Array.from(document.querySelectorAll('input[data-escalar-index]'))
+            .map(input => parseFloat(input.value) || 0);
 
-            // Get the components of the vectors
-            for (let j = 0; j < numVectores; j++) {
-                const components = [];
-                for (let i = 0; i < dimVectores; i++) {
-                    const input = document.querySelector(`input[data-vector-index="${j}"][data-component-index="${i}"]`);
-                    components.push(parseFloat(input.value) || 0); // Use 0 if no value is present
+        if (!vectores.length || !escalares.length) {
+            alert('Por favor, completa los vectores y escalares antes de enviar.');
+            return;
+        }
+
+        inputVector.value = JSON.stringify(vectores);
+        inputEscalar.value = JSON.stringify(escalares);
+
+        // Make AJAX request
+        const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+        fetch(resolverForm.action, {
+            method: 'POST',
+            body: new FormData(resolverForm),
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest',
+                'X-CSRFToken': csrftoken
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.status === 'success') {
+                resultText.textContent = data.resultados.join(', ');  // Update results in the HTML
+            } else {
+                let errorMessage = data.message;
+                if (data.errors) {
+                    errorMessage += '\nErrores específicos:\n' + data.errors.join('\n');
                 }
-                vectores.push(components);
+                alert(errorMessage);
             }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Ocurrió un error al enviar los datos.');
+        });
+    });
 
-            // Get the scalars
-            for (let j = 0; j < numVectores; j++) {
-                const inputScalar = document.querySelector(`input[data-vector-index="${j}"][data-is-scalar]`);
-                escalares.push(parseFloat(inputScalar.value) || 0); // Use 0 if no value is present
+    resolverForm.addEventListener('submit', async (event) => {
+        event.preventDefault();
+        try {
+            const idsResponse = await fetch('/get-existing-ids/');
+            const idsData = await idsResponse.json();
+            console.log('Existing IDs:', idsData.ids);
+
+            const formData = new FormData(resolverForm);
+            formData.append('OpV_vectores', inputVector.value);
+            formData.append('OpV_escalares', inputEscalar.value);
+            const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+
+            const response = await fetch(resolverForm.action, {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'X-CSRFToken': csrftoken
+                }
+            });
+
+            const data = await response.json();
+            if (data.status === 'success') {
+                alert('Datos guardados exitosamente');
+                resultText.textContent = data.resultados.join(', ');
+            } else {
+                let errorMessage = data.message;
+                if (data.errors) {
+                    errorMessage += '\nErrores específicos:\n' + data.errors.join('\n');
+                }
+                alert(errorMessage);
             }
-
-            // Convert to JSON and assign to form fields
-            inputVector.value = JSON.stringify(vectores);
-            inputEscalar.value = JSON.stringify(escalares);
-
-            // Submit the form
-            resolverForm.submit(); // Submit the form directly
-        };
+        } catch (error) {
+            console.error('Error:', error);
+            alert('Ocurrió un error al enviar los datos.');
+        }
     });
 });

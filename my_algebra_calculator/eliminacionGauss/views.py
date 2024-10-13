@@ -7,7 +7,8 @@ from .models import *
 from .forms import *
 from django.views.decorators.http import require_POST
 import json
-from .logic import *
+from .logic.matriz import Matriz
+from .logic.vector import Vector
 
 # Configure logging
 logger = logging.getLogger(__name__)
@@ -74,60 +75,47 @@ def escalonar_process(request):
     return JsonResponse({'status': 'error', 'message': 'Formulario no válido.', 'errors': errors}, status=400)
 
 def combinarVectores_view(request):
-    form = CombVectorForm()
+    """Renderiza la plantilla combinarVectores.html con el formulario."""
+    form = CombVectorForm()  # Suponiendo que tienes un formulario en Django
     return render(request, 'combinarVectores.html', {'form': form})
 
 def get_existing_idsVector(request):
+    """Devuelve una respuesta JSON con los IDs existentes de las operaciones de vectores."""
     ids = list(Ope_combinadas.objects.values_list('id', flat=True))
     return JsonResponse({'ids': ids})
 
 @require_POST
 def combinarVectores_process(request):
-    logger.debug(f"Request POST data: {request.POST}")
-
+    logger.debug(f"Datos POST recibidos: {request.POST}")
     vectores_datos = request.POST.get('OpV_vectores')
     escalares_datos = request.POST.get('OpV_escalares')
 
-    # Verificar si se proporcionaron los datos de vectores y escalares
     if not vectores_datos or not escalares_datos:
-        logger.error("OpV_vectores or OpV_escalares not provided.")
+        logger.error("OpV_vectores o OpV_escalares no proporcionados.")
         return JsonResponse({'status': 'error', 'message': 'OpV_vectores o OpV_escalares no proporcionados.'}, status=400)
 
     try:
-        # Cargar datos de JSON
         vectores_json = json.loads(vectores_datos)
         escalares_json = json.loads(escalares_datos)
 
-        # Crear instancias de Vector
-        vectores = [Vector(vector) for vector in vectores_json]
-        escalares = [float(escalar) for escalar in escalares_json]
-
-        # Validar que la cantidad de vectores y escalares coincida
-        if len(vectores) != len(escalares):
+        if len(vectores_json) != len(escalares_json):
             raise ValueError("La cantidad de vectores debe coincidir con la cantidad de escalares.")
 
-        # Validar que todos los vectores tengan la misma longitud
-        longitud = len(vectores[0].componentes)
-        for vector in vectores:
-            if len(vector.componentes) != longitud:
-                raise ValueError("Todos los vectores deben tener la misma longitud.")
+        lista_vectores = [Vector(vector) for vector in vectores_json]
+        resultado_vector = Vector.suma_escalada(lista_vectores, escalares_json)
 
-        # Realizar operaciones con los vectores
-        resultado_vector = Vector.suma_escalada(vectores, escalares)
-
-        # Crear y guardar una instancia de Ope_combinadas
         ope_combinadas_instance = Ope_combinadas.objects.create(
             OpV_vectores=vectores_json,
             OpV_escalares=escalares_json,
-            OpV_resultado=resultado_vector.componentes,  # Guarda el resultado de la operación
-            OpV_ecuaciones=' '.join([f"{escalar} * {vector}" for escalar, vector in zip(escalares, vectores)])  # Crear la ecuación
+            OpV_resultado=resultado_vector.componentes,
+            OpV_ecuaciones=' + '.join([f"{escalar} * {vector}" for escalar, vector in zip(escalares_json, vectores_json)])
         )
 
         logger.info("Combinación de vectores completada exitosamente.")
         return JsonResponse({'status': 'success', 'resultados': resultado_vector.componentes})
 
     except (ValueError, json.JSONDecodeError) as e:
-        logger.error(f"Error procesando datos: {str(e)}")
+        logger.error(f"Error al procesar los datos: {str(e)}")
         return JsonResponse({'status': 'error', 'message': str(e)}, status=400)
 
 def filaXvector_view(request):
