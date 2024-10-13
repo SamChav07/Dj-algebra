@@ -1,7 +1,8 @@
 from django.contrib import admin
-from .models import *
+from .models import Elim_Gauss
 
 # Register your models here.
 class EG_admin(admin.ModelAdmin):
-    list_display = ('EG_fila', 'EG_columna', 'EG_valor',)
+    list_display = ('id',)  # Asegúrate de que sea una tupla, incluso con un solo elemento
+
 admin.site.register(Elim_Gauss, EG_admin)

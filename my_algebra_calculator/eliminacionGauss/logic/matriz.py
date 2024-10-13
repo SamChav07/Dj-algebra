@@ -5,10 +5,10 @@ from eliminacionGauss.models import Elim_Gauss
 class Matriz:
     """Clase que representa una matriz y permite realizar eliminación Gaussiana."""
 
-    def __init__(self, eg_table_id):
-        """Inicializa la matriz obteniendo los datos desde la base de datos usando el ID de la tabla."""
+    def __init__(self, elim_gauss_id):
+        """Inicializa la matriz obteniendo los datos desde la base de datos usando el ID de Elim_Gauss."""
         try:
-            entrada = Elim_Gauss.objects.get(EG_tabla_id=eg_table_id)
+            entrada = Elim_Gauss.objects.get(id=elim_gauss_id)  # Cambiado a 'id'
             self.matriz = entrada.EG_matriz  # Se espera que EG_matriz sea una lista de listas
         except Elim_Gauss.DoesNotExist:
             raise ValueError("No hay entradas en la base de datos para esta tabla.")

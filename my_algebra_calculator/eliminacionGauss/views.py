@@ -4,10 +4,10 @@ import logging
 from django.shortcuts import render
 from django.http import JsonResponse
 from .models import *
-from .forms import ElimGaussForm
+from .forms import *
 from django.views.decorators.http import require_POST
 import json
-from .logic.matriz import Matriz  
+from .logic import *
 
 # Configure logging
 logger = logging.getLogger(__name__)
@@ -15,26 +15,18 @@ logger = logging.getLogger(__name__)
 def main_view(request):
     return render(request, 'main.html')
 
-def all_gauss_view(request):
+def escalonar_view(request):
     form = ElimGaussForm()  
-    return render(request, 'all_Gauss.html', {'form': form})  
+    return render(request, 'escalonar.html', {'form': form})  
 
 def get_existing_ids(request):
-    ids = list(Elim_Gauss.objects.values_list('EG_tabla_id', flat=True))
+    ids = list(Elim_Gauss.objects.values_list('id', flat=True))
     return JsonResponse({'ids': ids})
 
 @require_POST
-def all_gauss_process(request):
+def escalonar_process(request):
     # Log incoming POST data
     logger.debug(f"Request POST data: {request.POST}")
-
-    # Retrieve EG_tabla_id from the POST data
-    eg_table_id = request.POST.get('EG_tabla_id')
-    
-    # Check if EG_tabla_id is provided
-    if not eg_table_id:
-        logger.error("EG_tabla_id not provided.")
-        return JsonResponse({'status': 'error', 'message': 'EG_tabla_id no proporcionado.'}, status=400)
 
     # Create a form instance with the POST data
     form = ElimGaussForm(request.POST)
@@ -55,11 +47,10 @@ def all_gauss_process(request):
             # Save the matrix in the Elim_Gauss table
             elim_gauss_instance = Elim_Gauss.objects.create(
                 EG_matriz=matriz_json,
-                EG_tabla_id=eg_table_id,
             )
 
-            # Call the Matriz class and perform Gaussian elimination
-            matriz = Matriz(eg_table_id)
+            # Call the Matriz class and perform Gaussian elimination using the id
+            matriz = Matriz(elim_gauss_instance.id)  # Use the newly created instance's id
             resultado = matriz.eliminacion_gaussiana()
 
             # Update the result in the database
@@ -82,8 +73,62 @@ def all_gauss_process(request):
     logger.warning("Form validation failed: %s", errors)
     return JsonResponse({'status': 'error', 'message': 'Formulario no válido.', 'errors': errors}, status=400)
 
-def op_comb_view(request):
-    return render(request, 'Op_comb.html')
+def combinarVectores_view(request):
+    form = CombVectorForm()
+    return render(request, 'combinarVectores.html', {'form': form})
 
-def mult_flcl_view(request):
-    return render(request, 'mult_FlCl.html')
+def get_existing_idsVector(request):
+    ids = list(Ope_combinadas.objects.values_list('id', flat=True))
+    return JsonResponse({'ids': ids})
+
+@require_POST
+def combinarVectores_process(request):
+    logger.debug(f"Request POST data: {request.POST}")
+
+    vectores_datos = request.POST.get('OpV_vectores')
+    escalares_datos = request.POST.get('OpV_escalares')
+
+    # Verificar si se proporcionaron los datos de vectores y escalares
+    if not vectores_datos or not escalares_datos:
+        logger.error("OpV_vectores or OpV_escalares not provided.")
+        return JsonResponse({'status': 'error', 'message': 'OpV_vectores o OpV_escalares no proporcionados.'}, status=400)
+
+    try:
+        # Cargar datos de JSON
+        vectores_json = json.loads(vectores_datos)
+        escalares_json = json.loads(escalares_datos)
+
+        # Crear instancias de Vector
+        vectores = [Vector(vector) for vector in vectores_json]
+        escalares = [float(escalar) for escalar in escalares_json]
+
+        # Validar que la cantidad de vectores y escalares coincida
+        if len(vectores) != len(escalares):
+            raise ValueError("La cantidad de vectores debe coincidir con la cantidad de escalares.")
+
+        # Validar que todos los vectores tengan la misma longitud
+        longitud = len(vectores[0].componentes)
+        for vector in vectores:
+            if len(vector.componentes) != longitud:
+                raise ValueError("Todos los vectores deben tener la misma longitud.")
+
+        # Realizar operaciones con los vectores
+        resultado_vector = Vector.suma_escalada(vectores, escalares)
+
+        # Crear y guardar una instancia de Ope_combinadas
+        ope_combinadas_instance = Ope_combinadas.objects.create(
+            OpV_vectores=vectores_json,
+            OpV_escalares=escalares_json,
+            OpV_resultado=resultado_vector.componentes,  # Guarda el resultado de la operación
+            OpV_ecuaciones=' '.join([f"{escalar} * {vector}" for escalar, vector in zip(escalares, vectores)])  # Crear la ecuación
+        )
+
+        logger.info("Combinación de vectores completada exitosamente.")
+        return JsonResponse({'status': 'success', 'resultados': resultado_vector.componentes})
+
+    except (ValueError, json.JSONDecodeError) as e:
+        logger.error(f"Error procesando datos: {str(e)}")
+        return JsonResponse({'status': 'error', 'message': str(e)}, status=400)
+
+def filaXvector_view(request):
+    return render(request, 'filaXvector.html')

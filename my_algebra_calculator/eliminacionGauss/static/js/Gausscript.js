@@ -1,8 +1,8 @@
 document.addEventListener('DOMContentLoaded', function () {
     const createMatrixBtn = document.getElementById('createMatrixBtn');
-    const resolverForm = document.getElementById('resolverForm');
     const matrixContainer = document.getElementById('matrixContainer');
     const resolveBtn = document.getElementById('resolveBtn');
+    const resolverForm = document.getElementById('resolverForm');
 
     // Event listener for creating the matrix
     createMatrixBtn.addEventListener('click', function () {
@@ -57,11 +57,11 @@ document.addEventListener('DOMContentLoaded', function () {
             // Fetch a new table ID
             const egTablaId = await fetchNewTableId();
 
-            console.log('New eg_tabla_id:', egTablaId);
+            console.log('New id:', egTablaId);
 
             // Prepare data to send
             const datosAEnviar = {
-                EG_tabla_id: egTablaId,  // Use the newly fetched ID
+                id: egTablaId,  // Use the newly fetched ID
                 EG_matriz: JSON.stringify(matriz), // Convert matrix to JSON string
             };
 
