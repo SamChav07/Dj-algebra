@@ -24,6 +24,8 @@ def get_existing_ids(request):
     ids = list(Elim_Gauss.objects.values_list('id', flat=True))
     return JsonResponse({'ids': ids})
 
+
+
 @require_POST
 def escalonar_process(request):
     # Log incoming POST data
