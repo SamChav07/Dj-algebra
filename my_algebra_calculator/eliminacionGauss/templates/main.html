@@ -101,7 +101,7 @@
 
         
         <!-- Custom styles for this template -->
-        <link href="product.css" rel="stylesheet">
+        <link href="{% static 'css/product.css' %}" rel="stylesheet">
     </head>
     <body>
         <svg xmlns="http://www.w3.org/2000/svg" class="d-none">
@@ -217,20 +217,25 @@
             </div>
 
             <div class="d-md-flex flex-md-equal w-100 my-md-3 ps-md-3">
-                <div class="text-bg-dark me-md-3 pt-3 px-3 pt-md-5 px-md-5 text-center overflow-hidden">
-                    <div class="my-3 py-3">
-                        <h2 class="display-5">Método Escalonado</h2>
-                        <p class="lead">Una técnica sistemática para transformar la matriz del sistema en su forma escalonada por filas.</p>
+                <a href="{% url "escalonar_view" %}" class="text-decoration-none">
+                    <div class="text-bg-dark me-md-3 pt-3 px-3 pt-md-5 px-md-5 text-center overflow-hidden">
+                        <div class="my-3 py-3">
+                            <h2 class="display-5">Método Escalonado</h2>
+                            <p class="lead">Una técnica sistemática para transformar la matriz del sistema en su forma escalonada por filas.</p>
+                        </div>
+                        <div class="bg-body-tertiary shadow-sm mx-auto" style="width: 80%; height: 300px; border-radius: 21px 21px 0 0;"></div>
                     </div>
-                    <div class="bg-body-tertiary shadow-sm mx-auto" style="width: 80%; height: 300px; border-radius: 21px 21px 0 0;"></div>
-                </div>
-                <div class="bg-body-tertiary me-md-3 pt-3 px-3 pt-md-5 px-md-5 text-center overflow-hidden">
-                    <div class="my-3 p-3">
-                        <h2 class="display-5">Operaciones combinadas de Vectores</h2>
-                        <p class="lead">Formas de manipular y combinar vectores en álgebra lineal.</p>
+                </a>
+
+                <a href="{% url "combinarVectores_view" %}" class="text-decoration-none"> 
+                    <div class="bg-body-tertiary me-md-3 pt-3 px-3 pt-md-5 px-md-5 text-center overflow-hidden">
+                        <div class="my-3 p-3">
+                            <h2 class="display-5">Operaciones combinadas de Vectores</h2>
+                            <p class="lead">Formas de manipular y combinar vectores en álgebra lineal.</p>
+                        </div>
+                        <div class="bg-dark shadow-sm mx-auto" style="width: 80%; height: 300px; border-radius: 21px 21px 0 0;"></div>
                     </div>
-                    <div class="bg-dark shadow-sm mx-auto" style="width: 80%; height: 300px; border-radius: 21px 21px 0 0;"></div>
-                </div>
+                </a>
             </div>
 
             <div class="d-md-flex flex-md-equal w-100 my-md-3 ps-md-3">
