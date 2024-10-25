@@ -12,72 +12,32 @@ document.addEventListener('DOMContentLoaded', function () {
         // Clear previous matrix container
         matrixContainer.innerHTML = '';
 
-        // Validate inputs
-        if (!validarEntradas(filas, columnas)) return;
-
-        // Create and display the matrix
-        crearMatriz(filas, columnas);
-
-        // Show the "Resolve" button
-        resolveBtn.style.display = 'block';
-    });
-
-    // Function to fetch existing table IDs and assign a new one
-    async function fetchNewTableId() {
-        try {
-            const response = await fetch('/get-existing-ids/'); // Use the correct endpoint here
-            if (!response.ok) throw new Error('Network response was not ok');
-
-            const data = await response.json();
-            console.log('Existing IDs:', data.ids);
-
-            // Determine the next available ID (incrementing from max)
-            let newId = data.ids.length > 0 ? Math.max(...data.ids) + 1 : 1;
-
-            return newId;
-        } catch (error) {
-            console.error('Error fetching table IDs:', error);
-            alert('Error al obtener el ID de la tabla.');
-            throw error; // Rethrow error to handle it in submit event
+        // Validate inputs and create matrix if valid
+        if (validarEntradas(filas, columnas)) {
+            crearMatriz(filas, columnas);
+            resolveBtn.style.display = 'block'; // Show the "Resolve" button
         }
-    }
+    });
 
     // Event listener for form submission
     resolverForm.addEventListener('submit', async function (event) {
         event.preventDefault(); // Prevent traditional form submission
 
         try {
-            // Get the number of rows and columns
-            const filas = parseInt(document.getElementById('id_filas').value);
-            const columnas = parseInt(document.getElementById('id_columnas').value);
-
-            // Convert matrix inputs to JSON format
             const matriz = obtenerMatriz();
+            const formData = new URLSearchParams({
+                EG_matriz: JSON.stringify(matriz) // Convert matrix to JSON string
+            });
 
-            // Fetch a new table ID
-            const egTablaId = await fetchNewTableId();
-
-            console.log('New id:', egTablaId);
-
-            // Prepare data to send
-            const datosAEnviar = {
-                id: egTablaId,  // Use the newly fetched ID
-                EG_matriz: JSON.stringify(matriz), // Convert matrix to JSON string
-            };
-
-            console.log('Datos a enviar:', datosAEnviar);  // Log data being sent
-
-            const formData = new URLSearchParams(datosAEnviar); // Format data for sending
-
-            const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value; // Get CSRF token
+            const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
 
             // Send data to the server using Fetch API
-            const response = await fetch(resolverForm.action, { 
+            const response = await fetch(resolverForm.action, {
                 method: 'POST',
                 body: formData,
                 headers: {
                     'X-Requested-With': 'XMLHttpRequest',
-                    'X-CSRFToken': csrftoken 
+                    'X-CSRFToken': csrftoken
                 }
             });
 
@@ -86,13 +46,15 @@ document.addEventListener('DOMContentLoaded', function () {
             // Handle server response
             if (data.status === 'success') {
                 alert('Datos guardados exitosamente');
-                document.getElementById('resultText').textContent = data.resultados; // Show results
+                document.getElementById('resultText').textContent = data.resultados;
+
+                // Plot results
+                const resultados = data.resultados.split('\n');
+                const variables = resultados.filter(line => line.startsWith("x"));
+                const valores = variables.map(v => parseFloat(v.split("=")[1].trim()));
+                graficarResultados(valores);
             } else {
-                let errorMessage = data.message;
-                if (data.errors) {
-                    errorMessage += '\nErrores específicos:\n' + data.errors.join('\n');
-                }
-                alert(errorMessage); // Show detailed error message
+                alert(data.message); // Show detailed error message
             }
         } catch (error) {
             console.error('Error:', error);
@@ -100,7 +62,32 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     });
 
-    // Function to validate input entries
+    function graficarResultados(valores) {
+        const ctx = document.getElementById('miGrafico').getContext('2d');
+        const datos = {
+            labels: ['X1', 'X2'], // Adjust labels according to your results
+            datasets: [{
+                label: 'Variables',
+                data: valores,
+                fill: false,
+                borderColor: 'blue',
+                stepped: true
+            }]
+        };
+
+        new Chart(ctx, {
+            type: 'line', // Type of chart
+            data: datos,
+            options: {
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+    }
+
     function validarEntradas(filas, columnas) {
         if (isNaN(filas) || filas <= 0) {
             alert('Por favor, ingresa un número válido de ecuaciones (mayor que 0).');
@@ -110,37 +97,34 @@ document.addEventListener('DOMContentLoaded', function () {
             alert('Por favor, ingresa un número válido de incógnitas (mayor que 0).');
             return false;
         }
+        if (filas !== columnas) {
+            alert('La matriz debe ser cuadrada. Asegúrate de que el número de ecuaciones y el número de incógnitas sea igual.');
+            return false;
+        }
         return true;
     }
 
-    // Function to create the matrix table
     function crearMatriz(filas, columnas) {
         const table = document.createElement('table');
-        table.className = 'table table-bordered'; 
+        table.className = 'table table-bordered';
 
         for (let i = 0; i < filas; i++) {
-            const row = document.createElement('tr'); 
-
-            for (let j = 0; j < columnas; j++) {
-                const cell = document.createElement('td'); 
-                const input = document.createElement('input'); 
-
+            const row = document.createElement('tr');
+            for (let j = 0; j < (columnas + 1); j++) {
+                const cell = document.createElement('td');
+                const input = document.createElement('input');
                 input.type = 'number';
-                input.className = 'form-control'; 
-                input.placeholder = `(${i + 1}, ${j + 1})`; 
-                input.name = `valor_${i + 1}_${j + 1}`; 
-
-                cell.appendChild(input); 
-                row.appendChild(cell); 
+                input.className = 'form-control';
+                input.placeholder = `(${i + 1}, ${j + 1})`;
+                input.name = `valor_${i + 1}_${j + 1}`;
+                cell.appendChild(input);
+                row.appendChild(cell);
             }
-
-            table.appendChild(row); 
+            table.appendChild(row);
         }
-
-        matrixContainer.appendChild(table); 
+        matrixContainer.appendChild(table);
     }
 
-    // Function to obtain the matrix as a two-dimensional array
     function obtenerMatriz() {
         const filas = parseInt(document.getElementById('id_filas').value);
         const columnas = parseInt(document.getElementById('id_columnas').value);
@@ -150,11 +134,10 @@ document.addEventListener('DOMContentLoaded', function () {
             const fila = [];
             for (let j = 0; j < columnas; j++) {
                 const input = document.querySelector(`input[name='valor_${i + 1}_${j + 1}']`);
-                fila.push(parseFloat(input.value) || 0); 
+                fila.push(parseFloat(input.value) || 0);
             }
             matriz.push(fila);
         }
-
         return matriz;
     }
 });

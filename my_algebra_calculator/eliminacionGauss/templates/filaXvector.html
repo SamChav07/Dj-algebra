@@ -6,16 +6,16 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>CalcX</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous"> <!-- Ruta al archivo CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous"> 
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
-    <script src="{% static "js/MultiplicacionVector.js" %}" defer></script> <!-- Cargar el script de forma diferida -->
+    <script src="{% static "js/MultiplicacionVector.js" %}" defer></script>
     <style>
         .result-container {
-            background-color: #ffffff; /* Fondo blanco para el área de resultados */
-            padding: 20px; /* Espaciado interno */
-            border-radius: 5px; /* Bordes redondeados */
-            height: 100%; /* Altura completa */
+            background-color: #ffffff;
+            padding: 20px;
+            border-radius: 5px;
+            height: 100%;
         }
         .matrix-container {
             margin-top: 20px;
@@ -26,28 +26,25 @@
             margin-top: 10px;
         }
         .cell {
-            border: 1px solid #007bff; /* Borde azul */
+            border: 1px solid #007bff;
             padding: 10px;
             text-align: center;
-            background-color: #1f1f1f; /* Fondo oscuro para las celdas */
-            color: #ffffff; /* Texto blanco */
+            background-color: #1f1f1f;
+            color: #ffffff;
         }
         footer {
-            margin-top: 40px; /* Espaciado superior para el footer */
+            margin-top: 40px;
         }
     </style>
 </head>
-<body class="d-flex flex-column min-vh-100"> <!-- Aseguramos que el body ocupe toda la altura -->
-    <script src="bootstrap/js/bootstrap.bundle.min.js"></script> <!-- Ruta al archivo JS -->
+<body class="d-flex flex-column min-vh-100">
     
     <header class="text-center my-4">
-        <!-- NAV DE LOGO -->
         <nav class="navbar bg-body-tertiary d-flex justify-content-between">
             <div class="container-fluid d-flex align-items-center">
                 <a class="navbar-brand" href="main.html">
                     <img src="{% static "assets/calcXlogo.svg" %}" alt="Logo de calcX" style="width: 100%; height: 100px;">
                 </a>
-                <!-- NAV DE BOTONES DE NAVEGACION -->
                 <form class="d-flex align-items-center">
                     <button class="btn btn-primary me-2" type="button" onclick="window.location.href='{% url "main" %}'">Inicio</button>
                     <button class="btn btn-primary me-2" type="button" onclick="window.location.href='aboUs.html'">About Us</button>
@@ -57,42 +54,38 @@
         </nav>
     </header>
 
-    <div class="container mt-4 flex-grow-1"> <!-- Permitir que el contenedor crezca -->
+    <div class="container mt-4 flex-grow-1">
         <h1>Multiplicación Vector Fila x Columna</h1>
 
-        <!-- Contenedor para las entradas y resultados -->
         <div class="row">
-            <!-- Columna izquierda para entradas y matrices -->
             <div class="col-md-6">
-                <!-- Contenedor para la entrada de dimensión -->
-                <div class="mb-3">
-                    <label for="vectorDimension" class="form-label">Dimensión del vector:</label>
-                    <input type="number" class="form-control" id="vectorDimension" placeholder="Ejemplo: 3" min="1">
-                </div>
-
-                <!-- Botón "Crear Tablas" con ID para el evento de clic -->
-                <button id="createTablesBtn" class="btn btn-primary btn-lg w-100">Crear Tablas</button> 
-
-                <!-- Contenedor para mostrar las tablas -->
-                <div id="tablesContainer" class="matrix-container mt-4"></div>
-
-                <!-- Botón "Resolver", inicialmente oculto y con estilo igual al de crear tablas -->
-                <button id="resolveBtn" class="btn btn-primary btn-lg w-100 mt-3 d-none">Resolver</button> 
+                <form id="resolverForm" method="post" action="{% url 'filaXvector_process' %}">
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <label for="vectorDimension" class="form-label">Dimensión del vector:</label>
+                        <input type="number" class="form-control" id="vectorDimension" name="vectorDimension" placeholder="Ejemplo: 3" min="1">
+                    </div>
+                    
+                    <button type="button" id="createTablesBtn" class="btn btn-primary btn-lg w-100">Crear Tablas</button> 
+                
+                    <div id="tablesContainerFila" class="matrix-container mt-4"></div>
+                    <div id="tablesContainerColumn" class="matrix-container mt-4"></div>
+                
+                    <button type="submit" id="resolveBtn" class="btn btn-primary btn-lg w-100 mt-3 d-none">Guardar y Resolver</button> 
+                </form>                
             </div>
 
-            <!-- Columna derecha para resultados -->
             <div class="col-md-6">
                 <div class="result-container">
                     <h2>Resultados</h2>
-                    <!-- Aquí se pueden mostrar los resultados calculados -->
-                    <p>Aquí aparecerán los resultados.</p>
+                    <pre id="resultText">Aquí aparecerán los resultados.</pre>
                 </div>
             </div>
         </div>
-
     </div>
 
-    <!-- FOOTER -->
-    <footer class="text-center py-4 bg-body-tertiary"><p>&copy; 2024 My Algebra Calculator</p></footer>
+    <footer class="text-center py-4 bg-body-tertiary">
+        <p>&copy; 2024 My Algebra Calculator</p>
+    </footer>
 </body>
 </html>

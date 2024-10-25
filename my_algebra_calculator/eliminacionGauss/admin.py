@@ -8,5 +8,9 @@ class EG_admin(admin.ModelAdmin):
 class OpV_admin(admin.ModelAdmin):
     list_display = ('id',)
 
+class FxV_admin(admin.ModelAdmin):
+    list_display = ('id',)
+
 admin.site.register(Elim_Gauss, EG_admin)
 admin.site.register(Ope_combinadas, OpV_admin)
+admin.site.register(MultiFxC, FxV_admin)

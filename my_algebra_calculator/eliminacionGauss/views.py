@@ -16,6 +16,7 @@ logger = logging.getLogger(__name__)
 def main_view(request):
     return render(request, 'main.html')
 
+#vista_Gauss
 def escalonar_view(request):
     form = ElimGaussForm()  
     return render(request, 'escalonar.html', {'form': form})  
@@ -23,8 +24,6 @@ def escalonar_view(request):
 def get_existing_ids(request):
     ids = list(Elim_Gauss.objects.values_list('id', flat=True))
     return JsonResponse({'ids': ids})
-
-
 
 @require_POST
 def escalonar_process(request):
@@ -76,6 +75,7 @@ def escalonar_process(request):
     logger.warning("Form validation failed: %s", errors)
     return JsonResponse({'status': 'error', 'message': 'Formulario no válido.', 'errors': errors}, status=400)
 
+#vista_CombinaciondeVectores
 def combinarVectores_view(request):
     """Renderiza la plantilla combinarVectores.html con el formulario."""
     form = CombVectorForm()  # Suponiendo que tienes un formulario en Django
@@ -120,5 +120,49 @@ def combinarVectores_process(request):
         logger.error(f"Error al procesar los datos: {str(e)}")
         return JsonResponse({'status': 'error', 'message': str(e)}, status=400)
 
+#vista_filaXvector
 def filaXvector_view(request):
-    return render(request, 'filaXvector.html')
+    form = MultiFxCForm()
+    return render(request, 'filaXvector.html', {'form': form})
+
+def get_existing_idsfXv(request):
+    ids = list(MultiFxC.objects.values_list('id', flat=True))
+    return JsonResponse({'ids': ids})
+
+@require_POST
+def filaXvector_process(request):
+    logger.debug(f"Datos POST recibidos: {request.POST}")
+
+    fila_datos = request.POST.get('Mfc_Fila')
+    columna_datos = request.POST.get('Mfc_Column')
+
+    if not fila_datos or not columna_datos:
+        logger.error("Mfc_Fila o Mfc_Column no proporcionados.")
+        return JsonResponse({'status': 'error', 'message': 'Mfc_Fila o Mfc_Column no proporcionados.'}, status=400)
+
+    try:
+        fila_json = json.loads(fila_datos)
+        columna_json = json.loads(columna_datos)
+
+        if len(fila_json) != len(columna_json):
+            raise ValueError("El número de elementos en los vectores de fila y columna debe coincidir.")
+
+        vector_fila = Vector(fila_json)
+        vector_columna = Vector(columna_json)
+
+        resultado = vector_fila.multiplicar_por_vector(vector_columna)
+
+        # Crear instancia en la base de datos
+        multi_fxc_instance = MultiFxC.objects.create(
+            Mfc_Fila=fila_json,
+            Mfc_Column=columna_json,
+            Mfc_resultado=resultado.componentes,
+            Mfc_ecuaciones=' * '.join([f"{f} * {c}" for f, c in zip(fila_json, columna_json)])
+        )
+
+        logger.info("Multiplicación de vectores completada exitosamente.")
+        return JsonResponse({'status': 'success', 'resultados': resultado.componentes})
+
+    except (ValueError, json.JSONDecodeError) as e:
+        logger.error(f"Error al procesar los datos: {str(e)}")
+        return JsonResponse({'status': 'error', 'message': str(e)}, status=400)

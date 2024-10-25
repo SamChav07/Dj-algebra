@@ -7,6 +7,9 @@ urlpatterns = [
     path('get-existing-ids/', get_existing_ids, name='get_existing_ids'),
     path('escalonar/process/', escalonar_process, name='escalonar_process'),  # Vista para POST
     path('combinarVectores/', combinarVectores_view, name='combinarVectores_view'),  # Vista para Operaciones Combinadas de Vectores
+    path('get_existing_idsVector/', get_existing_idsVector, name='get_existing_idsVector'),
     path('combinarVectores/process/', combinarVectores_process, name='combinarVectores_process'),  # Vista para POST
     path('filaXvector/', filaXvector_view, name='filaXvector_view'),  # Vista para Multiplicación Vector Fila x Columna
+    path('get_existing_idsfXv/', get_existing_idsfXv, name='get_existing_idsfXv'),
+    path('filaXvector/process/', filaXvector_process, name='filaXvector_process'),  # Vista para POST
 ]
