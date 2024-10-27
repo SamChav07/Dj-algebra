@@ -17,10 +17,10 @@ logger = logging.getLogger(__name__)
 def main_view(request):
     return render(request, 'main.html')
 
-#vista_Gauss
+# Vista para la eliminación de Gauss
 def escalonar_view(request):
-    form = ElimGaussForm()  
-    return render(request, 'escalonar.html', {'form': form})  
+    form = ElimGaussForm()
+    return render(request, 'escalonar.html', {'form': form})
 
 def get_existing_ids(request):
     ids = list(Elim_Gauss.objects.values_list('id', flat=True))
@@ -31,21 +31,23 @@ def escalonar_process(request):
     # Log incoming POST data
     logger.debug(f"Request POST data: {request.POST}")
 
-    # Create a form instance with the POST data
-    form = ElimGaussForm(request.POST)
-
     # Check for EG_matriz presence
     matriz_datos = request.POST.get('EG_matriz')
     if not matriz_datos:
         logger.error("EG_matriz not provided.")
         return JsonResponse({'status': 'error', 'message': 'EG_matriz no proporcionado.'}, status=400)
 
+    # Create a form instance with the POST data
+    form = ElimGaussForm(request.POST)
+
     if form.is_valid():
         try:
             # Validate and parse the matrix data
             matriz_json = json.loads(matriz_datos)
-            if not isinstance(matriz_json, list):
-                raise ValueError("La matriz debe ser una lista.")
+
+            # Ensure matriz_json is a list of lists (matrix structure)
+            if not isinstance(matriz_json, list) or not all(isinstance(row, list) for row in matriz_json):
+                raise ValueError("La matriz debe ser una lista de listas.")
 
             # Save the matrix in the Elim_Gauss table
             elim_gauss_instance = Elim_Gauss.objects.create(
@@ -68,10 +70,7 @@ def escalonar_process(request):
             return JsonResponse({'status': 'error', 'message': str(e)}, status=400)
 
     # If the form is not valid, return specific errors
-    errors = []
-    for field, error_list in form.errors.items():
-        for error in error_list:
-            errors.append(f"{field}: {error}")
+    errors = [f"{field}: {error}" for field, error_list in form.errors.items() for error in error_list]
 
     logger.warning("Form validation failed: %s", errors)
     return JsonResponse({'status': 'error', 'message': 'Formulario no válido.', 'errors': errors}, status=400)

@@ -15,7 +15,6 @@ urlpatterns = [
     path('propMxV/', propMxV_view, name='propMxV_view'),  
     path('get_existing_ids_pMxV/', get_existing_ids_pMxV, name='get_existing_ids_pMxV'),
     path('propMxV/process/', propMxV_process, name='propMxV_process'),  # Vista para POST
-
     path('smMrx/', smMrx_view, name='smMrx_view'),  
     path('get_existing_ids_smMrx/', get_existing_ids_smMrx, name='get_existing_ids_smMrx'),
     path('smMrx/process/', smMrx_process, name='smMrx_process'),  # Vista para POST
