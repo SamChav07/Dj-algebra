@@ -14,8 +14,8 @@ class Elim_Gauss(models.Model):
 class Ope_combinadas(models.Model):
     OpV_vectores = models.JSONField() #vectores
     OpV_escalares = models.JSONField()# Escalares en funcion a n OpV_NmVectores
-    OpV_resultado = models.JSONField()
-    OpV_ecuaciones = models.TextField()
+    OpV_resultado = models.JSONField(null=True, blank=True)
+    OpV_ecuaciones = models.TextField(null=True, blank=True)
     def __str__(self):
         return f"Ope_combinadas {self.id}"
 
@@ -23,7 +23,26 @@ class Ope_combinadas(models.Model):
 class MultiFxC(models.Model):
     Mfc_Fila = models.JSONField()  
     Mfc_Column = models.JSONField()
-    Mfc_resultado = models.JSONField()
-    Mfc_ecuaciones = models.TextField()
+    Mfc_resultado = models.JSONField(null=True, blank=True)
+    Mfc_ecuaciones = models.TextField(null=True, blank=True)
     def __str__(self):
         return f"MultiFxC {self.id}"
+
+#Modelo del metodo Producto Matriz por Vector y Propiedad
+class PropMxV(models.Model):
+    pMxV_matrix = models.JSONField()
+    pMxV_vectorU = models.JSONField()
+    pMxV_vectorV = models.JSONField()
+    pMxV_resultado = models.JSONField(null=True, blank=True)
+    pMxV_ecuaciones = models.TextField(null=True, blank=True)
+    def __str__(self):
+        return f"PropMxV {self.id}"
+
+#Modelo del metodo Suma de matrices
+class SmMrx(models.Model):
+    sMrx_matrxS = models.JSONField()
+    sMrx_escalares = models.JSONField()
+    sMrx_resultado = models.JSONField(null=True, blank=True)
+    sMrx_ecuaciones = models.JSONField(null=True, blank=True)
+    def __str__(self):
+        return f"SmMrx {self.id}"

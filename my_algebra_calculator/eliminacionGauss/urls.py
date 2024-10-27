@@ -12,4 +12,11 @@ urlpatterns = [
     path('filaXvector/', filaXvector_view, name='filaXvector_view'),  # Vista para Multiplicación Vector Fila x Columna
     path('get_existing_idsfXv/', get_existing_idsfXv, name='get_existing_idsfXv'),
     path('filaXvector/process/', filaXvector_process, name='filaXvector_process'),  # Vista para POST
+    path('propMxV/', propMxV_view, name='propMxV_view'),  
+    path('get_existing_ids_pMxV/', get_existing_ids_pMxV, name='get_existing_ids_pMxV'),
+    path('propMxV/process/', propMxV_process, name='propMxV_process'),  # Vista para POST
+
+    path('smMrx/', smMrx_view, name='smMrx_view'),  
+    path('get_existing_ids_smMrx/', get_existing_ids_smMrx, name='get_existing_ids_smMrx'),
+    path('smMrx/process/', smMrx_process, name='smMrx_process'),  # Vista para POST
 ]
