@@ -1,43 +1,48 @@
-from django.db import models
+# eliminacionGauss/models.py
 
 from django.db import models
 
+#Modelo del metodo escalonado
 class Elim_Gauss(models.Model):
-    EG_ecuaciones = models.IntegerField()  # Número de filas
-    EG_incognitas = models.IntegerField()  # Número de columnas
-    EG_fila = models.IntegerField()  # Fila del valor
-    EG_columna = models.IntegerField()  # Columna del valor
-    EG_valor = models.FloatField()  # Valor individual
-
-    class Meta:
-        unique_together = ('EG_fila', 'EG_columna')  # Asegura que no haya duplicados para la misma celda en la matriz
-
+    EG_matriz = models.JSONField()  #Guarda la matriz completa 
+    EG_resultado = models.JSONField(null=True, blank=True)  # Resultado de la eliminación gaussiana
+    EG_ecuaciones = models.TextField(null=True, blank=True)  # Guarda los procedimientos
     def __str__(self):
-        return f"({self.EG_fila}, {self.EG_columna}): {self.EG_valor}"  # Formato deseado
+        return f"Elim_Gauss {self.id}"
 
+#Modelo del metodo operaciones combinadas de vectores
 class Ope_combinadas(models.Model):
-    OpV_NmVectores = models.IntegerField()# Columnas X
-    OpV_DmVectores = models.IntegerField()# Filas Y
-    OpV_valor = models.FloatField()
-    class Meta:
-        unique_together = ('OpV_NmVectores', 'OpV_DmVectores')
+    OpV_vectores = models.JSONField() #vectores
+    OpV_escalares = models.JSONField()# Escalares en funcion a n OpV_NmVectores
+    OpV_resultado = models.JSONField(null=True, blank=True)
+    OpV_ecuaciones = models.TextField(null=True, blank=True)
     def __str__(self):
-        return f"({self.OpV_NmVectores}, {self.OpV_DmVectores}): {self.OpV_valor}"
+        return f"Ope_combinadas {self.id}"
 
-class MltFC_horizontal(models.Model):
-    MfcX_NmVectorX = models.IntegerField()
-    MfcX_NmVectorY = models.IntegerField()
-    MfcX_valor = models.FloatField()
-    class Meta:
-        unique_together = ('MfcX_NmVectorX', 'MfcX_NmVectorY')
+#Modelo del metodo multiplicacion vector fila x columna
+class MultiFxC(models.Model):
+    Mfc_Fila = models.JSONField()  
+    Mfc_Column = models.JSONField()
+    Mfc_resultado = models.JSONField(null=True, blank=True)
+    Mfc_ecuaciones = models.TextField(null=True, blank=True)
     def __str__(self):
-        return f"({self.MfcX_NmVectorX}, {self.MfcX_NmVectorY}): {self.MfcX_valor}"
+        return f"MultiFxC {self.id}"
 
-class MltFC_vertical(models.Model):
-    MfcY_NmVectorX = models.IntegerField()
-    MfcY_NmVectorY = models.IntegerField()
-    MfcY_valor = models.FloatField()
-    class Meta:
-        unique_together = ('MfcY_NmVectorX', 'MfcY_NmVectorY')
+#Modelo del metodo Producto Matriz por Vector y Propiedad
+class PropMxV(models.Model):
+    pMxV_matrix = models.JSONField()
+    pMxV_vectorU = models.JSONField()
+    pMxV_vectorV = models.JSONField()
+    pMxV_resultado = models.JSONField(null=True, blank=True)
+    pMxV_ecuaciones = models.TextField(null=True, blank=True)
     def __str__(self):
-        return f"({self.MfcX_NmVectorX}, {self.MfcX_NmVectorY}): {self.MfcX_valor}"
+        return f"PropMxV {self.id}"
+
+#Modelo del metodo Suma de matrices
+class SmMrx(models.Model):
+    sMrx_matrxS = models.JSONField()
+    sMrx_escalares = models.JSONField()
+    sMrx_resultado = models.JSONField(null=True, blank=True)
+    sMrx_ecuaciones = models.JSONField(null=True, blank=True)
+    def __str__(self):
+        return f"SmMrx {self.id}"

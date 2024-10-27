@@ -1,37 +1,40 @@
+// ../js/PropMxV.js - Producto Matriz por Vector y Propiedad
 document.addEventListener('DOMContentLoaded', function () {
     const createMatrixBtn = document.getElementById('createMatrixBtn');
     const matrixContainer = document.getElementById('matrixContainer');
     const resolveBtn = document.getElementById('resolveBtn');
     const resolverForm = document.getElementById('resolverForm');
 
-    // Event listener for creating the matrix
+    // Evento para crear la matriz y los vectores
     createMatrixBtn.addEventListener('click', function () {
         const filas = parseInt(document.getElementById('id_filas').value);
         const columnas = parseInt(document.getElementById('id_columnas').value);
+        
+        matrixContainer.innerHTML = '';  // Limpiar el contenedor
 
-        // Clear previous matrix container
-        matrixContainer.innerHTML = '';
-
-        // Validate inputs and create matrix if valid
         if (validarEntradas(filas, columnas)) {
             crearMatriz(filas, columnas);
-            resolveBtn.style.display = 'block'; // Show the "Resolve" button
+            crearVector('vectorU', columnas, 'Vector U');  // Crear vector en función de las columnas
+            crearVector('vectorV', columnas, 'Vector V');  // Crear vector en función de las columnas
+            resolveBtn.style.display = 'block';  // Mostrar el botón "Resolver"
         }
     });
 
-    // Event listener for form submission
     resolverForm.addEventListener('submit', async function (event) {
-        event.preventDefault(); // Prevent traditional form submission
-
+        event.preventDefault();
         try {
             const matriz = obtenerMatriz();
+            const vectorU = obtenerVector('vectorU');
+            const vectorV = obtenerVector('vectorV');
             const formData = new URLSearchParams({
-                EG_matriz: JSON.stringify(matriz) // Convert matrix to JSON string
+                EG_matriz: JSON.stringify(matriz),
+                EG_vectorU: JSON.stringify(vectorU),
+                EG_vectorV: JSON.stringify(vectorV),
             });
-
+            
+            console.log("Datos enviados:", formData.toString());  // Comprobación de datos antes de enviar
+    
             const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
-
-            // Send data to the server using Fetch API
             const response = await fetch(resolverForm.action, {
                 method: 'POST',
                 body: formData,
@@ -40,21 +43,13 @@ document.addEventListener('DOMContentLoaded', function () {
                     'X-CSRFToken': csrftoken
                 }
             });
-
-            const data = await response.json(); // Parse JSON response
-
-            // Handle server response
-            if (data.status === 'success') {
-                alert('Datos guardados exitosamente');
-                document.getElementById('resultText').textContent = data.resultados;
-
-                // Plot results
-                const resultados = data.resultados.split('\n');
-                const variables = resultados.filter(line => line.startsWith("x"));
-                const valores = variables.map(v => parseFloat(v.split("=")[1].trim()));
-                graficarResultados(valores);
+    
+            const data = await response.json();
+            if (response.ok) {
+                document.getElementById('resultText').textContent = data.resultado;
             } else {
-                alert(data.message); // Show detailed error message
+                console.error("Error de respuesta:", data.message);
+                alert(data.message || 'Error al procesar la solicitud.');
             }
         } catch (error) {
             console.error('Error:', error);
@@ -62,43 +57,13 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     });
 
-    function graficarResultados(valores) {
-        const ctx = document.getElementById('miGrafico').getContext('2d');
-        const datos = {
-            labels: ['X1', 'X2'], // Adjust labels according to your results
-            datasets: [{
-                label: 'Variables',
-                data: valores,
-                fill: false,
-                borderColor: 'blue',
-                stepped: true
-            }]
-        };
-
-        new Chart(ctx, {
-            type: 'line', // Type of chart
-            data: datos,
-            options: {
-                scales: {
-                    y: {
-                        beginAtZero: true
-                    }
-                }
-            }
-        });
-    }
-
     function validarEntradas(filas, columnas) {
         if (isNaN(filas) || filas <= 0) {
-            alert('Por favor, ingresa un número válido de ecuaciones (mayor que 0).');
+            alert('Por favor, ingresa un número válido de filas.');
             return false;
         }
         if (isNaN(columnas) || columnas <= 0) {
-            alert('Por favor, ingresa un número válido de incógnitas (mayor que 0).');
-            return false;
-        }
-        if (filas !== columnas) {
-            alert('La matriz debe ser cuadrada. Asegúrate de que el número de ecuaciones y el número de incógnitas sea igual.');
+            alert('Por favor, ingresa un número válido de columnas.');
             return false;
         }
         return true;
@@ -107,16 +72,15 @@ document.addEventListener('DOMContentLoaded', function () {
     function crearMatriz(filas, columnas) {
         const table = document.createElement('table');
         table.className = 'table table-bordered';
-
         for (let i = 0; i < filas; i++) {
             const row = document.createElement('tr');
-            for (let j = 0; j < (columnas + 1); j++) {
+            for (let j = 0; j < columnas; j++) {
                 const cell = document.createElement('td');
                 const input = document.createElement('input');
                 input.type = 'number';
                 input.className = 'form-control';
                 input.placeholder = `(${i + 1}, ${j + 1})`;
-                input.name = `valor_${i + 1}_${j + 1}`;
+                input.name = `matriz_${i}_${j}`;
                 cell.appendChild(input);
                 row.appendChild(cell);
             }
@@ -125,19 +89,49 @@ document.addEventListener('DOMContentLoaded', function () {
         matrixContainer.appendChild(table);
     }
 
+    function crearVector(vectorName, columnas, headerText) {
+        const vectorContainer = document.createElement('div');
+        const table = document.createElement('table');
+        table.className = 'table table-bordered';
+        const rowHeader = document.createElement('tr');
+        const th = document.createElement('th');
+        th.textContent = headerText;
+        rowHeader.appendChild(th);
+        table.appendChild(rowHeader);
+
+        for (let i = 0; i < columnas; i++) {  // Usar el número de columnas para el tamaño del vector
+            const row = document.createElement('tr');
+            const cell = document.createElement('td');
+            const input = document.createElement('input');
+            input.type = 'number';
+            input.className = 'form-control';
+            input.placeholder = `Componente ${i + 1}`;
+            input.name = `${vectorName}_${i}`;
+            cell.appendChild(input);
+            row.appendChild(cell);
+            table.appendChild(row);
+        }
+
+        vectorContainer.appendChild(table);
+        matrixContainer.appendChild(vectorContainer);
+    }
+
     function obtenerMatriz() {
         const filas = parseInt(document.getElementById('id_filas').value);
         const columnas = parseInt(document.getElementById('id_columnas').value);
         const matriz = [];
-
         for (let i = 0; i < filas; i++) {
             const fila = [];
             for (let j = 0; j < columnas; j++) {
-                const input = document.querySelector(`input[name='valor_${i + 1}_${j + 1}']`);
+                const input = document.querySelector(`input[name='matriz_${i}_${j}']`);
                 fila.push(parseFloat(input.value) || 0);
             }
             matriz.push(fila);
         }
         return matriz;
+    }
+
+    function obtenerVector(vectorName) {
+        return Array.from(document.querySelectorAll(`input[name^=${vectorName}]`)).map(input => parseFloat(input.value) || 0);
     }
 });

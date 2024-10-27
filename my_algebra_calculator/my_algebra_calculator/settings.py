@@ -44,7 +44,7 @@ MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
-    'django.middleware.csrf.CsrfViewMiddleware',
+    'django.middleware.csrf.CsrfViewMiddleware',  # CSRF Middleware is enabled
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
@@ -116,15 +116,18 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.2/howto/static-files/
 
-STATIC_URL = '/static/'  # Asegúrate de que termine con una barra diagonal
 
-STATICFILES_DIRS = [
-    BASE_DIR / "eliminacionGauss/static",  # Sin barra inicial
-]
-
-STATIC_ROOT = BASE_DIR / 'eliminacionGauss/templates'
+STATIC_URL = '/static/'
+STATICFILES_DIRS = [BASE_DIR / "eliminacionGauss" / "static"]  # Path to static files within your app
+STATIC_ROOT = BASE_DIR / "staticfiles"  # Where static files will be collected
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+# CSRF Configuration for AJAX
+
+# Make sure that your AJAX requests include the CSRF token correctly by including it in your templates:
+# e.g., {% csrf_token %} within forms and retrieving it with JavaScript for XHR requests.
+CSRF_TRUSTED_ORIGINS = ['http://127.0.0.1', 'http://localhost']
