@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Matriz con Suma de Columnas</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+        #resultado {
+            margin-top: 20px;
+            border: 1px solid #000;
+            padding: 10px;
+            width: fit-content;
+        }
+    </style>
+</head>
+<body>
+    <h1>Matriz con Suma de Columnas</h1>
+    <div id="resultado"></div>
+
+    <script>
+        // Dimensiones de la matriz
+        const n = 2; // Filas
+        const m = 2; // Columnas
+        
+        // Crear matriz inicial
+        let matriz = [];
+        let valorInicial = 1;
+
+        for (let i = 0; i < n; i++) {
+            matriz[i] = [];
+            for (let j = 0; j < m; j++) {
+                matriz[i][j] = valorInicial++;
+            }
+        }
+
+        // Sumar 1 a cada elemento de las columnas
+        for (let i = 0; i < n; i++) {
+            for (let j = 0; j < m; j++) {
+                matriz[i][j] += 1;
+            }
+        }
+
+        // Calcular la suma de cada columna
+        let sumaColumnas = Array(m).fill(0); // Crear un arreglo para almacenar las sumas
+
+        for (let j = 0; j < m; j++) {
+            for (let i = 0; i < n; i++) {
+                sumaColumnas[j] += matriz[i][j];
+            }
+        }
+
+        // Agregar la fila de sumas a la matriz
+        matriz.push(sumaColumnas);
+
+        // Crear objeto JSON
+        let resultado = {
+            matriz: matriz,
+            mensaje: "Los datos de la matriz han sido procesados."
+        };
+
+        // Mostrar el resultado en el div
+        const resultadoDiv = document.getElementById('resultado');
+        resultadoDiv.innerHTML = `
+            <h2>Resultado en formato JSON:</h2>
+            <pre>${JSON.stringify(resultado, null, 2)}</pre>
+        `;
+    </script>
+</body>
+</html>

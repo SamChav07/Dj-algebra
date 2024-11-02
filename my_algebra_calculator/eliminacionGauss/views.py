@@ -19,8 +19,8 @@ def main_view(request):
 
 # Vista para la eliminación de Gauss
 def escalonar_view(request):
-    form = ElimGaussForm()
-    return render(request, 'escalonar.html', {'form': form})
+    form = ElimGaussForm()  
+    return render(request, 'escalonar.html', {'form': form})  
 
 def get_existing_ids(request):
     ids = list(Elim_Gauss.objects.values_list('id', flat=True))
@@ -31,22 +31,20 @@ def escalonar_process(request):
     # Log incoming POST data
     logger.debug(f"Request POST data: {request.POST}")
 
+    # Create a form instance with the POST data
+    form = ElimGaussForm(request.POST)
+
     # Check for EG_matriz presence
     matriz_datos = request.POST.get('EG_matriz')
     if not matriz_datos:
         logger.error("EG_matriz not provided.")
         return JsonResponse({'status': 'error', 'message': 'EG_matriz no proporcionado.'}, status=400)
 
-    # Create a form instance with the POST data
-    form = ElimGaussForm(request.POST)
-
     if form.is_valid():
         try:
             # Validate and parse the matrix data
             matriz_json = json.loads(matriz_datos)
-
-            # Ensure matriz_json is a list of lists (matrix structure)
-            if not isinstance(matriz_json, list) or not all(isinstance(row, list) for row in matriz_json):
+            if not isinstance(matriz_json, list) or not all(isinstance(i, list) for i in matriz_json):
                 raise ValueError("La matriz debe ser una lista de listas.")
 
             # Save the matrix in the Elim_Gauss table
@@ -65,12 +63,18 @@ def escalonar_process(request):
             logger.info("Gaussian elimination completed successfully.")
             return JsonResponse({'status': 'success', 'resultados': resultado})
 
-        except (ValueError, json.JSONDecodeError) as e:
+        except json.JSONDecodeError:
+            logger.error("EG_matriz no es un JSON válido.")
+            return JsonResponse({'status': 'error', 'message': 'EG_matriz no es un JSON válido.'}, status=400)
+        except ValueError as e:
             logger.error(f"Error processing matrix data: {str(e)}")
             return JsonResponse({'status': 'error', 'message': str(e)}, status=400)
 
     # If the form is not valid, return specific errors
-    errors = [f"{field}: {error}" for field, error_list in form.errors.items() for error in error_list]
+    errors = []
+    for field, error_list in form.errors.items():
+        for error in error_list:
+            errors.append(f"{field}: {error}")
 
     logger.warning("Form validation failed: %s", errors)
     return JsonResponse({'status': 'error', 'message': 'Formulario no válido.', 'errors': errors}, status=400)
@@ -276,17 +280,4 @@ def smMrx_process(request):
             sMrx_escalares=escalares_json
         )
 
-        logger.debug("Instancia creada: %s", sm_mrx_instance)
-
-        matriz_instance = Matriz(sm_mrx_instance.id)
-        resultado_texto = matriz_instance.suma_matrices()
-
-        sm_mrx_instance.sMrx_resultado = resultado_texto
-        sm_mrx_instance.save()
-
-        logger.info("Procesamiento completado.")
-        return JsonResponse({'status': 'success', 'resultado': resultado_texto})
-
-    except (ValueError, json.JSONDecodeError) as e:
-        logger.error(f"Error al procesar los datos JSON: {str(e)}")
-        return JsonResponse({'status': 'error', 'message': str(e)}, status=400)
+        logger.debug("Instancia creada: %s", sm_mrx_insta

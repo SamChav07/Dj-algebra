@@ -2,6 +2,7 @@
 
 from django import forms
 from .models import *
+import json
 
 #Forms01
 class ElimGaussForm(forms.ModelForm):
@@ -14,17 +15,6 @@ class ElimGaussForm(forms.ModelForm):
         labels = {
             'EG_matriz': 'Matriz (en formato JSON)',
         }
-
-    def clean_EG_matriz(self):
-        """Método para validar el campo EG_matriz."""
-        matriz = self.cleaned_data.get('EG_matriz')
-        try:
-            # Validar si la matriz es un JSON válido
-            import json
-            json.loads(matriz)
-        except (ValueError, TypeError):
-            raise forms.ValidationError("El formato de la matriz no es válido. Debe ser un JSON.")
-        return matriz
 
 #Forms02
 class CombVectorForm(forms.ModelForm):
@@ -40,26 +30,6 @@ class CombVectorForm(forms.ModelForm):
             'OpV_escalares': 'Escalares (en formato JSON)',
         }
 
-    def clean_OpV_vectores(self):
-        """Método para validar el campo OpV_vectores."""
-        vectores = self.cleaned_data.get('OpV_vectores')
-        try:
-            import json
-            json.loads(vectores)
-        except (ValueError, TypeError):
-            raise forms.ValidationError("El formato de los vectores no es válido. Debe ser un JSON.")
-        return vectores
-
-    def clean_OpV_escalares(self):
-        """Método para validar el campo OpV_escalares."""
-        escalares = self.cleaned_data.get('OpV_escalares')
-        try:
-            import json
-            json.loads(escalares)
-        except (ValueError, TypeError):
-            raise forms.ValidationError("El formato de los escalares no es válido. Debe ser un JSON.")
-        return escalares
-
 #Forms03
 class MultiFxCForm(forms.ModelForm):
     class Meta:
@@ -73,26 +43,6 @@ class MultiFxCForm(forms.ModelForm):
             'Mfc_Fila': 'Fila (en formato JSON)',
             'Mfc_Column': 'Columna (en formato JSON)',
         }
-
-    def clean_Mfc_Fila(self):
-        """Método para validar el campo Mfc_Fila."""
-        fila = self.cleaned_data.get('Mfc_Fila')
-        try:
-            import json
-            json.loads(fila)
-        except (ValueError, TypeError):
-            raise forms.ValidationError("El formato de la fila no es válido. Debe ser un JSON.")
-        return fila
-
-    def clean_Mfc_Column(self):
-        """Método para validar el campo Mfc_Column."""
-        columna = self.cleaned_data.get('Mfc_Column')
-        try:
-            import json
-            json.loads(columna)
-        except (ValueError, TypeError):
-            raise forms.ValidationError("El formato de la columna no es válido. Debe ser un JSON.")
-        return columna
 
 #Forms04
 class PropMxVForm(forms.ModelForm):
