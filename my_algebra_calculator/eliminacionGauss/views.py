@@ -17,7 +17,7 @@ logger = logging.getLogger(__name__)
 def main_view(request):
     return render(request, 'main.html')
 
-# Vista para la eliminación de Gauss
+#1 Vista para la eliminación de Gauss
 def escalonar_view(request):
     form = ElimGaussForm()  
     return render(request, 'escalonar.html', {'form': form})  
@@ -79,7 +79,7 @@ def escalonar_process(request):
     logger.warning("Form validation failed: %s", errors)
     return JsonResponse({'status': 'error', 'message': 'Formulario no válido.', 'errors': errors}, status=400)
 
-#vista_CombinaciondeVectores
+#2 Vista_CombinaciondeVectores
 def combinarVectores_view(request):
     """Renderiza la plantilla combinarVectores.html con el formulario."""
     form = CombVectorForm()  # Suponiendo que tienes un formulario en Django
@@ -108,17 +108,20 @@ def combinarVectores_process(request):
             raise ValueError("La cantidad de vectores debe coincidir con la cantidad de escalares.")
 
         lista_vectores = [Vector(vector) for vector in vectores_json]
-        resultado_vector = Vector.suma_escalada(lista_vectores, escalares_json)
+        resultado_vector, equation = Vector.suma_escalada(lista_vectores, escalares_json)
 
         ope_combinadas_instance = Ope_combinadas.objects.create(
             OpV_vectores=vectores_json,
             OpV_escalares=escalares_json,
             OpV_resultado=resultado_vector.componentes,
-            OpV_ecuaciones=' + '.join([f"{escalar} * {vector}" for escalar, vector in zip(escalares_json, vectores_json)])
+            OpV_ecuaciones=equation  # Use the formatted equation string
         )
 
         logger.info("Combinación de vectores completada exitosamente.")
-        return JsonResponse({'status': 'success', 'resultados': resultado_vector.componentes})
+        result_str = f"[{', '.join(f'{x:.2f}' for x in resultado_vector.componentes)}]"
+        styled_response = f"{equation} = {result_str}"
+
+        return JsonResponse({'status': 'success', 'resultados': resultado_vector.componentes, 'ecuacion': styled_response})
 
     except (ValueError, json.JSONDecodeError) as e:
         logger.error(f"Error al procesar los datos: {str(e)}")
@@ -137,12 +140,12 @@ def get_existing_idsfXv(request):
 def filaXvector_process(request):
     logger.debug(f"Datos POST recibidos: {request.POST}")
 
-    fila_datos = request.POST.get('Mfc_Fila')
-    columna_datos = request.POST.get('Mfc_Column')
+    fila_datos = request.POST.get('rowVector')
+    columna_datos = request.POST.get('colVector')
 
     if not fila_datos or not columna_datos:
-        logger.error("Mfc_Fila o Mfc_Column no proporcionados.")
-        return JsonResponse({'status': 'error', 'message': 'Mfc_Fila o Mfc_Column no proporcionados.'}, status=400)
+        logger.error("rowVector o colVector no proporcionados.")
+        return JsonResponse({'status': 'error', 'message': 'rowVector o colVector no proporcionados.'}, status=400)
 
     try:
         fila_json = json.loads(fila_datos)
@@ -154,18 +157,22 @@ def filaXvector_process(request):
         vector_fila = Vector(fila_json)
         vector_columna = Vector(columna_json)
 
-        resultado = vector_fila.multiplicar_por_vector(vector_columna)
+        # Realizar el producto punto
+        resultado = vector_fila.producto_punto(vector_columna)
 
-        # Crear instancia en la base de datos
+        # Formatear el resultado
+        resultado_texto = vector_fila.formato_resultado(vector_columna, resultado)
+
+        # Guardar instancia en la base de datos
         multi_fxc_instance = MultiFxC.objects.create(
             Mfc_Fila=fila_json,
             Mfc_Column=columna_json,
-            Mfc_resultado=resultado.componentes,
-            Mfc_ecuaciones=' * '.join([f"{f} * {c}" for f, c in zip(fila_json, columna_json)])
+            Mfc_resultado=resultado,
+            Mfc_ecuaciones=' + '.join([f"{f} * {c}" for f, c in zip(fila_json, columna_json)])
         )
 
         logger.info("Multiplicación de vectores completada exitosamente.")
-        return JsonResponse({'status': 'success', 'resultados': resultado.componentes})
+        return JsonResponse({'status': 'success', 'resultados': resultado_texto})
 
     except (ValueError, json.JSONDecodeError) as e:
         logger.error(f"Error al procesar los datos: {str(e)}")
@@ -280,4 +287,13 @@ def smMrx_process(request):
             sMrx_escalares=escalares_json
         )
 
-        logger.debug("Instancia creada: %s", sm_mrx_insta
+        logger.debug("Instancia creada: %s", sm_mrx_instance)
+
+        matriz_instance = Matriz(sm_mrx_instance.id)
+        resultado_texto = matriz_instance.suma_matrices()
+
+        sm_mrx_instance.sMrx_resultado = resultado_texto
+        sm_mrx_instance.save()
+
+        logger.info("Procesamiento completado.")
+        return 

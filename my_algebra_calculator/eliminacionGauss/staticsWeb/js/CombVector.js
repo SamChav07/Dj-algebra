@@ -104,7 +104,15 @@ document.addEventListener('DOMContentLoaded', () => {
         .then(response => response.json())
         .then(data => {
             if (data.status === 'success') {
-                resultText.textContent = data.resultados.join(', ');  // Update results in the HTML
+                // Format the results for display
+                const formattedResults = `Resultado: [${data.resultados.map(x => x.toFixed(2)).join(', ')}]`; // Adjust number formatting as needed
+                const formattedEquation = `Ecuación: ${data.ecuacion}`; // Assuming the equation is sent in the response
+
+                // Update the HTML with styled results
+                resultText.textContent = formattedResults;  // Update results in the HTML
+                equationText.textContent = formattedEquation; // Update equation in the HTML
+
+                alert('Datos guardados exitosamente');
             } else {
                 let errorMessage = data.message;
                 if (data.errors) {
@@ -119,18 +127,41 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    resolverForm.addEventListener('submit', async (event) => {
-        event.preventDefault();
+    resolverForm.addEventListener('submit', async function (event) {
+        event.preventDefault(); // Prevent traditional form submission
+    
         try {
+            // Fetch existing IDs to determine a unique identifier if necessary
             const idsResponse = await fetch('/get-existing-ids/');
+            if (!idsResponse.ok) throw new Error('Failed to fetch existing IDs');
+    
             const idsData = await idsResponse.json();
             console.log('Existing IDs:', idsData.ids);
-
-            const formData = new FormData(resolverForm);
-            formData.append('OpV_vectores', inputVector.value);
-            formData.append('OpV_escalares', inputEscalar.value);
+    
+            // Prepare data to send
+            const vectores = JSON.parse(inputVector.value);  // Parse vector data
+            const escalares = JSON.parse(inputEscalar.value);  // Parse scalar data
+    
+            const datosAEnviar = {
+                OpV_vectores: JSON.stringify(vectores),
+                OpV_escalares: JSON.stringify(escalares),
+            };
+    
+            // Validate vector and scalar data
+            if (!vectores.length || !escalares.length) {
+                alert('Por favor, completa los vectores y escalares antes de enviar.');
+                return;
+            }
+    
+            console.log('Datos a enviar:', datosAEnviar);  // Log data being sent
+    
+            // Format data for sending
+            const formData = new URLSearchParams(datosAEnviar);
+    
+            // Get CSRF token
             const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
-
+    
+            // Send data to the server using Fetch API
             const response = await fetch(resolverForm.action, {
                 method: 'POST',
                 body: formData,
@@ -139,8 +170,11 @@ document.addEventListener('DOMContentLoaded', () => {
                     'X-CSRFToken': csrftoken
                 }
             });
-
+    
+            // Parse JSON response
             const data = await response.json();
+    
+            // Handle server response
             if (data.status === 'success') {
                 alert('Datos guardados exitosamente');
                 resultText.textContent = data.resultados.join(', ');
@@ -149,11 +183,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (data.errors) {
                     errorMessage += '\nErrores específicos:\n' + data.errors.join('\n');
                 }
-                alert(errorMessage);
+                alert(errorMessage); // Show detailed error message
             }
         } catch (error) {
             console.error('Error:', error);
             alert('Ocurrió un error al enviar los datos.');
         }
-    });
+    });    
 });
