@@ -46,3 +46,6 @@ class SmMrx(models.Model):
     sMrx_ecuaciones = models.JSONField(null=True, blank=True)
     def __str__(self):
         return f"SmMrx {self.id}"
+
+class TrnsMtx(models.Model):
+    trMx

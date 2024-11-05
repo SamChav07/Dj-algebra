@@ -4,8 +4,8 @@ import logging
 import json
 from django.shortcuts import render
 from django.http import JsonResponse
-from .models import Elim_Gauss, Ope_combinadas, MultiFxC, PropMxV, SmMrx
-from .forms import ElimGaussForm, CombVectorForm, MultiFxCForm, PropMxVForm, SmMrxForm
+from .models import Elim_Gauss, Ope_combinadas, MultiFxC, PropMxV, SmMrx, TrnsMtx
+from .forms import ElimGaussForm, CombVectorForm, MultiFxCForm, PropMxVForm, SmMrxForm, TrnsMtxForm
 from django.views.decorators.http import require_POST
 from .logic.matriz import Matriz
 from .logic.vector import Vector
@@ -127,7 +127,7 @@ def combinarVectores_process(request):
         logger.error(f"Error al procesar los datos: {str(e)}")
         return JsonResponse({'status': 'error', 'message': str(e)}, status=400)
 
-#vista_filaXvector
+#3 vista_filaXvector
 def filaXvector_view(request):
     form = MultiFxCForm()
     return render(request, 'filaXvector.html', {'form': form})
@@ -186,16 +186,17 @@ def get_existing_ids_pMxV(request):
     ids = list(PropMxV.objects.values_list('id', flat=True))
     return JsonResponse({'ids': ids})
 
+#4 
 @require_POST
 def propMxV_process(request):
     logger.debug("Datos POST recibidos en propMxV_process: %s", request.POST)
 
-    matrix_data = request.POST.get('EG_matriz')
-    vectorU_data = request.POST.get('EG_vectorU')
-    vectorV_data = request.POST.get('EG_vectorV')
+    matrix_data = request.POST.get('pMxV_matrix')
+    vectorU_data = request.POST.get('pMxV_vectorU')
+    vectorV_data = request.POST.get('pMxV_vectorV')
 
     if not all([matrix_data, vectorU_data, vectorV_data]):
-        logger.error("Datos faltantes: EG_matriz, EG_vectorU o EG_vectorV no proporcionados.")
+        logger.error("Datos faltantes: pMxV_matrix, pMxV_vectorU o EG_vectpMxV_vectorVorV no proporcionados.")
         return JsonResponse({'status': 'error', 'message': 'Se requieren todos los campos: matriz, vector U y vector V.'}, status=400)
 
     try:
@@ -235,6 +236,7 @@ def propMxV_process(request):
         logger.error(f"Error al procesar los datos JSON: {str(e)}")
         return JsonResponse({'status': 'error', 'message': str(e)}, status=400)
 
+#5
 def smMrx_view(request):
     """Renderiza el formulario para la suma de matrices."""
     form = SmMrxForm()
@@ -296,4 +298,8 @@ def smMrx_process(request):
         sm_mrx_instance.save()
 
         logger.info("Procesamiento completado.")
-        return 
+        return JsonResponse({'status': 'success', 'resultado': resultado_texto})
+
+    except (ValueError, json.JSONDecodeError) as e:
+        logger.error(f"Error al procesar los datos JSON: {str(e)}")
+        return JsonRespons
