@@ -85,3 +85,15 @@ class TrnsMtxForm(forms.ModelForm):
         labels = {
             'trMx_Matriz': 'Matriz (en formato JSON)',
         }
+
+#Forms07
+class MultMtrXForm(forms.ModelForm):
+    class Meta:
+        model = multMtrX
+        fields = ['mMrx_Matrx']  # Include fields you want in the form
+        widgets = {
+            'mMrx_Matrx': forms.Textarea(attrs={'rows': 10, 'cols': 40, 'placeholder': 'Ejemplo: [[1, 2], [3, 4]]'}),
+        }
+        labels = {
+            'mMrx_Matrx': 'Matriz (en formato JSON)',
+        }

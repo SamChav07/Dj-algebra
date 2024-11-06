@@ -47,5 +47,18 @@ class SmMrx(models.Model):
     def __str__(self):
         return f"SmMrx {self.id}"
 
+#Transposicion de Matrices 
 class TrnsMtx(models.Model):
-    trMx
+    trMx_Matriz = models.JSONField()  #Guarda la matriz completa 
+    trMx_resultado = models.JSONField(null=True, blank=True)  # Resultado de la eliminación gaussiana
+    trMx_ecuaciones = models.TextField(null=True, blank=True)  # Guarda los procedimientos
+    def __str__(self):
+        return f"TrnsMtx {self.id}"
+
+#Multiplicacion de matrices
+class multMtrX(models.Model):
+    mMrx_Matrx = models.JSONField()
+    mMrx_resultado = models.JSONField(null=True, blank=True) 
+    mMrx_ecuaciones = models.TextField(null=True, blank=True)
+    def __str__(self):
+        return f"multMtrX {self.id}"

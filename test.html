@@ -3,70 +3,71 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Matriz con Suma de Columnas</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <style>
         body {
-            font-family: Arial, sans-serif;
+            background-color: #343a40; /* Fondo oscuro */
+            color: #ffffff; /* Texto en blanco */
         }
-        #resultado {
-            margin-top: 20px;
-            border: 1px solid #000;
-            padding: 10px;
-            width: fit-content;
+        .card {
+            background-color: #495057; /* Color de las tarjetas */
+            border: none; /* Sin borde */
+        }
+        .card-header {
+            background-color: #007bff; /* Color de fondo del encabezado */
+            color: #ffffff; /* Texto del encabezado en blanco */
+        }
+        .btn-primary {
+            background-color: #007bff; /* Color del botón */
+            border: none; /* Sin borde */
+        }
+        .btn-primary:hover {
+            background-color: #0056b3; /* Color del botón al pasar el ratón */
         }
     </style>
+    <title>Aplicación de Cálculo</title>
 </head>
 <body>
-    <h1>Matriz con Suma de Columnas</h1>
-    <div id="resultado"></div>
-
-    <script>
-        // Dimensiones de la matriz
-        const n = 2; // Filas
-        const m = 2; // Columnas
-        
-        // Crear matriz inicial
-        let matriz = [];
-        let valorInicial = 1;
-
-        for (let i = 0; i < n; i++) {
-            matriz[i] = [];
-            for (let j = 0; j < m; j++) {
-                matriz[i][j] = valorInicial++;
-            }
-        }
-
-        // Sumar 1 a cada elemento de las columnas
-        for (let i = 0; i < n; i++) {
-            for (let j = 0; j < m; j++) {
-                matriz[i][j] += 1;
-            }
-        }
-
-        // Calcular la suma de cada columna
-        let sumaColumnas = Array(m).fill(0); // Crear un arreglo para almacenar las sumas
-
-        for (let j = 0; j < m; j++) {
-            for (let i = 0; i < n; i++) {
-                sumaColumnas[j] += matriz[i][j];
-            }
-        }
-
-        // Agregar la fila de sumas a la matriz
-        matriz.push(sumaColumnas);
-
-        // Crear objeto JSON
-        let resultado = {
-            matriz: matriz,
-            mensaje: "Los datos de la matriz han sido procesados."
-        };
-
-        // Mostrar el resultado en el div
-        const resultadoDiv = document.getElementById('resultado');
-        resultadoDiv.innerHTML = `
-            <h2>Resultado en formato JSON:</h2>
-            <pre>${JSON.stringify(resultado, null, 2)}</pre>
-        `;
-    </script>
+    <div class="container mt-5">
+        <h1 class="text-center">Bienvenido a la Calculadora de Matrices</h1>
+        <div class="row">
+            <div class="col-md-4">
+                <div class="card text-center mb-4">
+                    <div class="card-header">
+                        <h3>Multiplicación de Vectores</h3>
+                    </div>
+                    <div class="card-body">
+                        <p class="card-text">Realiza la multiplicación de dos vectores.</p>
+                        <a href="#" class="btn btn-primary">Comenzar</a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card text-center mb-4">
+                    <div class="card-header">
+                        <h3>Multiplicación de Matrices</h3>
+                    </div>
+                    <div class="card-body">
+                        <p class="card-text">Multiplica matrices de diferentes dimensiones.</p>
+                        <a href="#" class="btn btn-primary">Comenzar</a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card text-center mb-4">
+                    <div class="card-header">
+                        <h3>Resultados</h3>
+                    </div>
+                    <div class="card-body">
+                        <p class="card-text">Visualiza los resultados de tus cálculos.</p>
+                        <a href="#" class="btn btn-primary">Ver Resultados</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.3/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 </body>
 </html>

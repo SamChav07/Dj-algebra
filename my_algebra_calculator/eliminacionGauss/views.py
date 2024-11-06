@@ -4,8 +4,8 @@ import logging
 import json
 from django.shortcuts import render
 from django.http import JsonResponse
-from .models import Elim_Gauss, Ope_combinadas, MultiFxC, PropMxV, SmMrx, TrnsMtx
-from .forms import ElimGaussForm, CombVectorForm, MultiFxCForm, PropMxVForm, SmMrxForm, TrnsMtxForm
+from .models import Elim_Gauss, Ope_combinadas, MultiFxC, PropMxV, SmMrx, TrnsMtx, multMtrX
+from .forms import ElimGaussForm, CombVectorForm, MultiFxCForm, PropMxVForm, SmMrxForm, TrnsMtxForm, MultMtrXForm
 from django.views.decorators.http import require_POST
 from .logic.matriz import Matriz
 from .logic.vector import Vector
@@ -47,18 +47,9 @@ def escalonar_process(request):
             if not isinstance(matriz_json, list) or not all(isinstance(i, list) for i in matriz_json):
                 raise ValueError("La matriz debe ser una lista de listas.")
 
-            # Save the matrix in the Elim_Gauss table
-            elim_gauss_instance = Elim_Gauss.objects.create(
-                EG_matriz=matriz_json,
-            )
-
-            # Call the Matriz class and perform Gaussian elimination using the id
-            matriz = Matriz(elim_gauss_instance.id)  # Use the newly created instance's id
-            resultado = matriz.eliminacion_gaussiana()
-
-            # Update the result in the database
-            elim_gauss_instance.EG_resultado = resultado
-            elim_gauss_instance.save()
+            # Create an instance of Matriz directly with the matrix data
+            matriz = Matriz(matriz_json)  # No need for the ID now
+            resultado = matriz.eliminacion_gaussiana()  # Perform Gaussian elimination
 
             logger.info("Gaussian elimination completed successfully.")
             return JsonResponse({'status': 'success', 'resultados': resultado})
@@ -302,4 +293,121 @@ def smMrx_process(request):
 
     except (ValueError, json.JSONDecodeError) as e:
         logger.error(f"Error al procesar los datos JSON: {str(e)}")
-        return JsonRespons
+        return JsonResponse({'status': 'error', 'message': str(e)}, status=400)
+
+#6
+def trnsMtx_view(request):
+    form = TrnsMtxForm()
+    return render(request, 'trnsMtrx.html', {'form': form})
+
+# 2. Vista para obtener los IDs existentes
+def get_existing_ids_trnsMtx(request):
+    """Devuelve una respuesta JSON con los IDs existentes de las operaciones de transposición de matrices."""
+    ids = list(TrnsMtx.objects.values_list('id', flat=True))
+    return JsonResponse({'ids': ids})
+
+# 3. Vista para procesar la transposición de la matriz
+@require_POST
+def trnsMtx_process(request):
+    # Log de los datos recibidos en POST
+    logger.debug(f"Request POST data: {request.POST}")
+
+    # Instancia del formulario con los datos POST
+    form = TrnsMtxForm(request.POST)
+
+    # Verificar la presencia de la matriz en los datos POST
+    matriz_datos = request.POST.get('trMx_Matriz')
+    if not matriz_datos:
+        logger.error("trMx_Matriz no proporcionado.")
+        return JsonResponse({'status': 'error', 'message': 'trMx_Matriz no proporcionado.'}, status=400)
+
+    if form.is_valid():
+        try:
+            # Validar y parsear los datos de la matriz
+            matriz_json = json.loads(matriz_datos)
+            if not isinstance(matriz_json, list) or not all(isinstance(i, list) for i in matriz_json):
+                raise ValueError("La matriz debe ser una lista de listas.")
+
+            # Crear la instancia de Matriz y calcular la transposición
+            matriz = Matriz(matriz_json)  # Crear la matriz usando los datos JSON
+            matriz_transpuesta = matriz.calcular_transpuesta()  # Obtener la matriz transpuesta
+
+            # Guardar la matriz original en el modelo TrnsMtx
+            trns_mtx_instance = TrnsMtx.objects.create(
+                trMx_Matriz=matriz_json,
+                trMx_resultado=matriz_transpuesta  # Guardar el resultado transpuesto
+            )
+
+            logger.info("Transposición de la matriz completada exitosamente.")
+            return JsonResponse({'status': 'success', 'resultados': matriz_transpuesta})
+
+        except json.JSONDecodeError:
+            logger.error("trMx_Matriz no es un JSON válido.")
+            return JsonResponse({'status': 'error', 'message': 'trMx_Matriz no es un JSON válido.'}, status=400)
+        except ValueError as e:
+            logger.error(f"Error al procesar los datos de la matriz: {str(e)}")
+            return JsonResponse({'status': 'error', 'message': str(e)}, status=400)
+
+    # Si el formulario no es válido, devolver errores específicos
+    errors = []
+    for field, error_list in form.errors.items():
+        for error in error_list:
+            errors.append(f"{field}: {error}")
+
+    logger.warning("Falló la validación del formulario: %s", errors)
+    return JsonResponse({'status': 'error', 'message': 'Formulario no válido.', 'errors': errors}, status=400)
+
+#7
+def multMtrX_view(request):
+    form = MultMtrXForm()
+    return render(request, 'multMtrX.html', {'form': form})
+
+def get_existing_ids_multMtrX(request):
+    """Devuelve los IDs existentes en la tabla MultMtrX."""
+    ids = list(MultMtrX.objects.values_list('id', flat=True))
+    return JsonResponse({'ids': ids})
+
+@require_POST
+def multMtrX_process(request):
+    """Procesa la multiplicación de matrices."""
+    logger.debug("Datos POST recibidos en multMtrX_process: %s", request.POST)
+
+    matrices_data = request.POST.get('mMrx_Matrx')
+
+    if not matrices_data:
+        logger.error("Datos faltantes: mMrx_Matrx no proporcionado.")
+        return JsonResponse({'status': 'error', 'message': 'Se requieren los datos de matrices.'}, status=400)
+
+    try:
+        matrices_json = json.loads(matrices_data)
+
+        # Validaciones de estructura de datos
+        if not isinstance(matrices_json, list) or not all(isinstance(matrix, list) for matrix in matrices_json):
+            raise ValueError("El formato de las matrices no es válido.")
+        
+        if not matrices_json:
+            raise ValueError("No se proporcionaron matrices.")
+
+        # Crear instancias de Matriz a partir de los datos recibidos
+        matrices = [Matriz(len(matrix), matrix) for matrix in matrices_json]
+        resultado = matrices[0]
+        pasos = "Proceso de Multiplicación de Matrices:\n\n"
+
+        # Multiplicar matrices en secuencia y documentar el proceso
+        for i in range(1, len(matrices)):
+            resultado, ecuacion_paso = resultado.multiplicar_por(matrices[i])
+            pasos += f"Paso {i}: Resultado parcial después de multiplicar con Matriz {i + 1}\n{ecuacion_paso}\n\n"
+
+        # Guardar resultado y pasos en la base de datos
+        mult_mtrx_instance = multMtrX.objects.create(
+            mMrx_Matrx=matrices_json,
+            mMrx_resultado=resultado.matriz,
+            mMrx_ecuaciones=pasos
+        )
+
+        logger.info("Procesamiento completado con éxito.")
+        return JsonResponse({'status': 'success', 'resultado': resultado.matriz, 'pasos': pasos})
+
+    except (ValueError, json.JSONDecodeError) as e:
+        logger.error(f"Error al procesar los datos JSON: {str(e)}")
+        return JsonResponse({'status': 'error', 'message': str(e)}, status=400)

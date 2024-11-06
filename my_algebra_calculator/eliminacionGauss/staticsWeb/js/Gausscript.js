@@ -45,38 +45,32 @@ createMatrixBtn.addEventListener('click', function () {
     // Event listener for form submission
     resolverForm.addEventListener('submit', async function (event) {
         event.preventDefault(); // Prevent traditional form submission
-    
+
         try {
             // Get the number of rows and columns
             const filas = parseInt(document.getElementById('id_filas').value);
             const columnas = parseInt(document.getElementById('id_columnas').value) + 1; // Include the extra column
-    
+
             // Convert matrix inputs to JSON format
             const matriz = obtenerMatriz();
-    
-            // Fetch a new table ID
-            const egTablaId = await fetchNewTableId();
-    
-            console.log('New id:', egTablaId);
-    
+
             // Prepare data to send
             const datosAEnviar = {
-                id: egTablaId,  // Use the newly fetched ID
-                EG_matriz: JSON.stringify(matriz), // Convert matrix to JSON string
+                EG_matriz: JSON.stringify(matriz) // Convert matrix to JSON string
             };
-    
+
             // Check if the matrix is valid
             if (datosAEnviar.EG_matriz === '[]') {
                 alert('La matriz está vacía o no es válida.');
                 return; // Exit the function if the matrix is invalid
             }
-    
-            console.log('Datos a enviar:', datosAEnviar);  // Log data being sent
-    
+
+            console.log('Datos a enviar:', datosAEnviar); // Log data being sent
+
             const formData = new URLSearchParams(datosAEnviar); // Format data for sending
-    
+
             const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value; // Get CSRF token
-    
+
             // Send data to the server using Fetch API
             const response = await fetch(resolverForm.action, { 
                 method: 'POST',
@@ -86,9 +80,9 @@ createMatrixBtn.addEventListener('click', function () {
                     'X-CSRFToken': csrftoken 
                 }
             });
-    
+
             const data = await response.json(); // Parse JSON response
-    
+
             // Handle server response
             if (data.status === 'success') {
                 alert('Datos guardados exitosamente');
@@ -104,7 +98,7 @@ createMatrixBtn.addEventListener('click', function () {
             console.error('Error:', error);
             alert('Ocurrió un error al enviar los datos.');
         }
-    });    
+    });
 
     // Function to validate input entries
     function validarEntradas(filas, columnas) {

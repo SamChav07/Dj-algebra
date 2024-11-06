@@ -202,23 +202,23 @@ class Matriz:
     
     def multiplicar_por(self, otra_matriz):
         """
-        Multiplica la matriz actual por otra matriz si las dimensiones son compatibles.
-        :param otra_matriz: instancia de Matriz que será multiplicada con la matriz actual
-        :return: nueva instancia de Matriz que representa el producto de las dos matrices
+        Multiplica la matriz actual por otra matriz y genera el paso en formato de texto.
         """
         if len(self.matriz[0]) != len(otra_matriz.matriz):
             raise ValueError("El número de columnas de la primera matriz debe coincidir con el número de filas de la segunda matriz.")
-        
-        # Inicializar la matriz resultado con ceros
+
         resultado = [[0] * len(otra_matriz.matriz[0]) for _ in range(len(self.matriz))]
-        
-        # Multiplicar matrices
+        ecuacion_paso = ""
+
         for i in range(len(self.matriz)):
             for j in range(len(otra_matriz.matriz[0])):
+                detalle_operacion = []
                 for k in range(len(otra_matriz.matriz)):
                     resultado[i][j] += self.matriz[i][k] * otra_matriz.matriz[k][j]
-        
-        return Matriz(len(resultado), resultado)
+                    detalle_operacion.append(f"{self.matriz[i][k]}*{otra_matriz.matriz[k][j]}")
+                ecuacion_paso += f"Elemento ({i+1}, {j+1}): {' + '.join(detalle_operacion)} = {resultado[i][j]}\n"
+
+        return Matriz(len(resultado), resultado), ecuacion_paso
     
     def calcular_determinante(self, paso_a_paso=False):
         """

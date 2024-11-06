@@ -22,4 +22,13 @@ urlpatterns = [
     #5
     path('smMrx/', smMrx_view, name='smMrx_view'),  
     path('get_existing_ids_smMrx/', get_existing_ids_smMrx, name='get_existing_ids_smMrx'),
-    path('smMrx/process/', smMrx_process, name='sm
+    path('smMrx/process/', smMrx_process, name='smMrx_process'),  # Vista para POST
+    #6
+    path('trnsMtx/', trnsMtx_view, name='trnsMtx_view'),  # Vista para cargar el formulario de transposición
+    path('get_existing_ids_trnsMtx/', get_existing_ids_trnsMtx, name='get_existing_ids_trnsMtx'),  # Vista para obtener los IDs existentes
+    path('trnsMtx/process/', trnsMtx_process, name='trnsMtx_process'),  # Vista para procesar la transposición de la matriz
+    #7
+    path('multMtrX/', multMtrX_view, name='multMtrX_view'),  # Vista para cargar el formulario de transposición
+    path('get_existing_ids_multMtrX/', get_existing_ids_multMtrX, name='get_existing_ids_multMtrX'),  # Vista para obtener los IDs existentes
+    path('multMtrX/process/', multMtrX_process, name='multMtrX_process'),  # Vista para procesar la transposición de la matriz
+]
