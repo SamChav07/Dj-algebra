@@ -5,10 +5,11 @@ document.addEventListener('DOMContentLoaded', function () {
     const resolveBtn = document.getElementById('resolveBtn');
     const resolverForm = document.getElementById('resolverForm');
     const resultText = document.getElementById('resultText');
+    const numMatricesInput = document.getElementById('id_numMatrices');
 
-    createMatrixBtn.addEventListener('click', function() {
-        const numMatrices = parseInt(document.getElementById('id_numMatrices').value);
-        matrixContainer.innerHTML = '';  // Limpiar matrices previas
+    createMatrixBtn.addEventListener('click', function () {
+        const numMatrices = parseInt(numMatricesInput.value);
+        matrixContainer.innerHTML = ''; // Limpiar matrices previas
 
         for (let i = 0; i < numMatrices; i++) {
             const matrixDiv = document.createElement('div');
@@ -32,7 +33,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
     validateBtn.addEventListener('click', function () {
         const matrices = [];
-        const numMatrices = parseInt(document.getElementById('id_numMatrices').value);
+        const numMatrices = parseInt(numMatricesInput.value);
 
         for (let i = 0; i < numMatrices; i++) {
             const filas = parseInt(document.getElementById(`id_filas_${i}`).value);
@@ -63,7 +64,11 @@ document.addEventListener('DOMContentLoaded', function () {
         matrices.forEach((matrix, index) => {
             const matrixTableDiv = document.createElement('div');
             matrixTableDiv.className = 'mb-4';
-            matrixTableDiv.innerHTML = `<h5>Valores de Matriz ${index + 1}</h5>`;
+            matrixTableDiv.innerHTML = `
+                <h5>Valores de Matriz ${index + 1}</h5>
+                <input type="hidden" id="id_filas_${index}" value="${matrix.filas}">
+                <input type="hidden" id="id_columnas_${index}" value="${matrix.columnas}">
+            `;
 
             const table = document.createElement('table');
             table.className = 'table table-bordered';
@@ -87,6 +92,11 @@ document.addEventListener('DOMContentLoaded', function () {
         event.preventDefault();
         const matrices = gatherMatrices();
 
+        if (!matrices) {
+            alert("Error al recolectar las matrices.");
+            return;
+        }
+
         try {
             const result = multiplyMatricesWithSteps(matrices);
             resultText.innerHTML = `<pre>${result.steps}</pre>`;
@@ -98,18 +108,30 @@ document.addEventListener('DOMContentLoaded', function () {
 
     function gatherMatrices() {
         const matrices = [];
-        const numMatrices = parseInt(document.getElementById('id_numMatrices').value);
+        const numMatrices = parseInt(numMatricesInput.value);
+
+        console.log("Número de matrices:", numMatrices);
 
         for (let matrixIndex = 0; matrixIndex < numMatrices; matrixIndex++) {
-            const filas = parseInt(document.getElementById(`id_filas_${matrixIndex}`).value);
-            const columnas = parseInt(document.getElementById(`id_columnas_${matrixIndex}`).value);
-            const matriz = [];
+            const filasInput = document.getElementById(`id_filas_${matrixIndex}`);
+            const columnasInput = document.getElementById(`id_columnas_${matrixIndex}`);
 
+            if (!filasInput || !columnasInput) {
+                console.error(`Error: Elementos id_filas_${matrixIndex} o id_columnas_${matrixIndex} no encontrados.`);
+                return null;
+            }
+
+            const filas = parseInt(filasInput.value);
+            const columnas = parseInt(columnasInput.value);
+
+            console.log(`Matriz ${matrixIndex + 1} - Filas: ${filas}, Columnas: ${columnas}`);
+
+            const matriz = [];
             for (let i = 0; i < filas; i++) {
                 const fila = [];
                 for (let j = 0; j < columnas; j++) {
                     const input = document.querySelector(`input[name='matriz_${matrixIndex}_${i}_${j}']`);
-                    fila.push(parseFloat(input.value) || 0);
+                    fila.push(parseFloat(input?.value) || 0);
                 }
                 matriz.push(fila);
             }
