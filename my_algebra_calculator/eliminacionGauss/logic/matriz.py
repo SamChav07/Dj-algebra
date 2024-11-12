@@ -333,13 +333,16 @@ class Matriz:
 
         # Extraer la matriz inversa del lado derecho
         inversa = [fila[n:] for fila in matriz_temp]
-        
+
+        # Convertir la matriz inversa en un string
+        resultado_str = formatear_matriz_temporal(inversa)
+
         if paso_a_paso:
             pasos += "Matriz inversa:\n"
-            pasos += formatear_matriz_temporal(inversa) + "\n"
-            return Matriz(n, inversa), pasos
+            pasos += resultado_str + "\n"
+            return resultado_str, pasos  # Devolver el resultado como string con pasos
         else:
-            return Matriz(n, inversa)
+            return resultado_str  # Solo devolver el resultado como string
     
     def cramer(self, resultados, paso_a_paso=False):
         """

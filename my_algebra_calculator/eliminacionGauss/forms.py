@@ -97,3 +97,41 @@ class MultMtrXForm(forms.ModelForm):
         labels = {
             'mMrx_Matrx': 'Matriz (en formato JSON)',
         }
+
+#Forms08
+class ClcDetermForm(forms.ModelForm):
+    class Meta:
+        model = ClcDeterm
+        fields = ['cldt_Matrx']
+        widgets = {
+            'cldt_Matrx': forms.Textarea(attrs={'rows': 10, 'cols': 40, 'placeholder': 'Ejemplo: [[1, 2], [3, 4]]'}),
+        }
+        labels = {
+            'cldt_Matrx': 'Matriz (en formato JSON)',
+        }
+
+#Forms09
+class InvMtrxForm(forms.ModelForm):
+    class Meta:
+        model = InvMtrx
+        fields = ['inmx_Matrx']
+        widgets = {
+            'inmx_Matrx': forms.Textarea(attrs={'rows': 10, 'cols': 40, 'placeholder': 'Ejemplo: [[1, 2], [3, 4]]'}),
+        }
+        labels = {
+            'inmx_Matrx': 'Matriz (en formato JSON)',
+        }
+
+#Forms10
+class RglCramerForm(forms.ModelForm):
+    class Meta:
+        model = RglCramer
+        fields = ['cramer_Matrx', 'cramer_TermsIndp']
+        widgets = {
+            'cramer_Matrx': forms.Textarea(attrs={'rows': 10, 'cols': 40, 'placeholder': 'Ejemplo: [[1, 2], [3, 4]]'}),
+            'cramer_TermsIndp': forms.Textarea(attrs={'rows': 10, 'cols': 40, 'placeholder': 'Ejemplo: [1, 2]'}),
+        }
+        labels = {
+            'cramer_Matrx': 'Matriz (en formato JSON)',
+            'cramer_TermsIndp': 'Terminos Independientes (en formato JSON)',
+        }

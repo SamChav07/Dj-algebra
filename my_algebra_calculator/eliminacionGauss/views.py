@@ -4,8 +4,8 @@ import logging
 import json
 from django.shortcuts import render
 from django.http import JsonResponse
-from .models import Elim_Gauss, Ope_combinadas, MultiFxC, PropMxV, SmMrx, TrnsMtx, multMtrX
-from .forms import ElimGaussForm, CombVectorForm, MultiFxCForm, PropMxVForm, SmMrxForm, TrnsMtxForm, MultMtrXForm
+from .models import Elim_Gauss, Ope_combinadas, MultiFxC, PropMxV, SmMrx, TrnsMtx, multMtrX, ClcDeterm, InvMtrx, RglCramer
+from .forms import ElimGaussForm, CombVectorForm, MultiFxCForm, PropMxVForm, SmMrxForm, TrnsMtxForm, MultMtrXForm, ClcDetermForm, InvMtrxForm, RglCramerForm
 from django.views.decorators.http import require_POST
 from .logic.matriz import Matriz
 from .logic.vector import Vector
@@ -16,6 +16,12 @@ logger = logging.getLogger(__name__)
 
 def main_view(request):
     return render(request, 'main.html')
+
+def mainAlgebra_view(request):
+    return render(request, 'mainAlgebraLineal.html')
+
+def mainNumAnalisis_view(request):
+    return render(request, 'mainNumericoAnalisis.html')
 
 #1 Vista para la eliminación de Gauss
 def escalonar_view(request):
@@ -407,6 +413,182 @@ def multMtrX_process(request):
 
         logger.info("Procesamiento completado con éxito.")
         return JsonResponse({'status': 'success', 'resultado': resultado.matriz, 'pasos': pasos})
+
+    except (ValueError, json.JSONDecodeError) as e:
+        logger.error(f"Error al procesar los datos JSON: {str(e)}")
+        return JsonResponse({'status': 'error', 'message': str(e)}, status=400)
+
+#8
+def clcDeterm_view(request):
+    form = ClcDetermForm()
+    return render(request, 'calcDeterminante.html', {'form': form})
+
+# View para obtener los IDs existentes
+def get_existing_ids_clcDeterm(request):
+    """Devuelve los IDs existentes en la tabla ClcDeterm."""
+    ids = list(ClcDeterm.objects.values_list('id', flat=True))
+    return JsonResponse({'ids': ids})
+
+# View para procesar el cálculo del determinante
+@require_POST
+def clcDeterm_process(request):
+    """Procesa el cálculo de determinantes."""
+    logger.debug("Datos POST recibidos en clc_determ_process: %s", request.POST)
+
+    matrices_data = request.POST.get('cldt_Matrx')
+
+    if not matrices_data:
+        logger.error("Datos faltantes: cldt_Matrx no proporcionado.")
+        return JsonResponse({'status': 'error', 'message': 'Se requieren los datos de matrices.'}, status=400)
+
+    try:
+        matrices_json = json.loads(matrices_data)
+
+        # Validaciones de estructura de datos
+        if not isinstance(matrices_json, list) or not all(isinstance(row, list) for row in matrices_json):
+            raise ValueError("El formato de la matriz no es válido.")
+        
+        if not matrices_json:
+            raise ValueError("No se proporcionaron matrices.")
+
+        # Crear una instancia de la clase Matriz solo con la matriz
+        matriz = Matriz(matrices_json)  # Solo pasamos la matriz como argumento
+
+        # Calcular determinante con pasos detallados
+        determinante, pasos = matriz.calcular_determinante(paso_a_paso=True)
+
+        # Guardar resultado y pasos en la base de datos
+        clc_determ_instance = ClcDeterm.objects.create(
+            cldt_Matrx=matrices_json,
+            cldt_resultado=determinante,
+            cldt_ecuaciones=pasos
+        )
+
+        logger.info("Procesamiento completado con éxito.")
+        return JsonResponse({
+            'status': 'success',
+            'resultado': determinante,
+            'pasos': pasos
+        })
+
+    except (ValueError, json.JSONDecodeError) as e:
+        logger.error(f"Error al procesar los datos JSON: {str(e)}")
+        return JsonResponse({'status': 'error', 'message': str(e)}, status=400)
+
+#9
+def invMtrx_view(request):
+    form = InvMtrxForm()
+    return render(request, 'inversaMatriz.html', {'form': form})
+
+# Vista para obtener los IDs existentes de las matrices invertidas
+def get_existing_ids_invMtrx(request):
+    """Devuelve los IDs existentes en la tabla InvMtrx."""
+    ids = list(InvMtrx.objects.values_list('id', flat=True))
+    return JsonResponse({'ids': ids})
+
+# Vista para procesar el cálculo de la inversa
+@require_POST
+def invMtrx_process(request):
+    """Procesa el cálculo de la inversa de una matriz."""
+    logger.debug("Datos POST recibidos en inv_mtrx_process: %s", request.body)
+
+    try:
+        # Parsear los datos JSON recibidos
+        data = json.loads(request.body.decode('utf-8'))
+
+        # Obtener la matriz desde el JSON
+        matrices_json = data.get('cldt_Matrx', None)
+
+        if not matrices_json:
+            logger.error("Datos faltantes: cldt_Matrx no proporcionado.")
+            return JsonResponse({'status': 'error', 'message': 'Se requieren los datos de matrices.'}, status=400)
+
+        # Validaciones de estructura de datos
+        if not isinstance(matrices_json, list) or not all(isinstance(row, list) for row in matrices_json):
+            raise ValueError("El formato de la matriz no es válido.")
+        
+        if not matrices_json:
+            raise ValueError("No se proporcionaron matrices.")
+
+        # Crear una instancia de la clase Matriz solo con la matriz
+        matriz = Matriz(matrices_json)  # Solo pasamos la matriz como argumento
+
+        # Calcular la inversa con pasos detallados
+        inversa, pasos = matriz.calcular_inversa(paso_a_paso=True)
+
+        # Guardar resultado y pasos en la base de datos
+        inv_mtrx_instance = InvMtrx.objects.create(
+            inmx_Matrx=matrices_json,
+            inmx_resultado=inversa,
+            inmx_ecuaciones=pasos
+        )
+
+        logger.info("Procesamiento completado con éxito.")
+        return JsonResponse({
+            'status': 'success',
+            'resultado': inversa,
+            'pasos': pasos
+        })
+
+    except (ValueError, json.JSONDecodeError) as e:
+        logger.error(f"Error al procesar los datos JSON: {str(e)}")
+        return JsonResponse({'status': 'error', 'message': str(e)}, status=400)
+
+def RglCramer_view(request):
+    # Crear una instancia del formulario
+    form = RglCramerForm()
+    return render(request, 'reglaCramer.html', {'form': form})
+
+def get_existing_ids_RglCramer(request):
+    """Devuelve los IDs existentes en la tabla RglCramer."""
+    # Obtener los IDs de las matrices ya calculadas
+    ids = list(RglCramer.objects.values_list('id', flat=True))
+    return JsonResponse({'ids': ids})
+
+@require_POST
+def RglCramer_process(request):
+    """Procesa el cálculo usando la regla de Cramer."""
+    logger.debug("Datos POST recibidos en RglCramer_process: %s", request.body)
+
+    try:
+        # Parsear los datos JSON recibidos
+        data = json.loads(request.body.decode('utf-8'))
+
+        # Obtener la matriz y los términos independientes desde el JSON
+        cramer_Matrx = data.get('cramer_Matrx', None)
+        cramer_TermsIndp = data.get('cramer_TermsIndp', None)
+
+        # Validaciones de datos
+        if not cramer_Matrx or not cramer_TermsIndp:
+            logger.error("Datos faltantes: cramer_Matrx o cramer_TermsIndp no proporcionados.")
+            return JsonResponse({'status': 'error', 'message': 'Se requieren los datos de la matriz y los términos independientes.'}, status=400)
+
+        if not isinstance(cramer_Matrx, list) or not all(isinstance(row, list) for row in cramer_Matrx):
+            raise ValueError("El formato de la matriz no es válido.")
+        
+        if not isinstance(cramer_TermsIndp, list) or len(cramer_TermsIndp) != len(cramer_Matrx):
+            raise ValueError("El número de términos independientes debe coincidir con el número de filas de la matriz.")
+
+        # Crear una instancia de la clase Matriz con la matriz recibida
+        matriz_obj = Matriz(len(cramer_Matrx), cramer_Matrx)
+
+        # Calcular la solución usando la regla de Cramer
+        resultado, pasos = matriz_obj.cramer(cramer_TermsIndp, paso_a_paso=True)
+
+        # Guardar el resultado en la base de datos
+        cramer_instance = RglCramer.objects.create(
+            cramer_Matrx=cramer_Matrx,
+            cramer_TermsIndp=cramer_TermsIndp,
+            cramer_resultado=resultado,
+            cramer_ecuaciones=pasos
+        )
+
+        logger.info("Procesamiento completado con éxito.")
+        return JsonResponse({
+            'status': 'success',
+            'resultado': resultado,
+            'pasos': pasos
+        })
 
     except (ValueError, json.JSONDecodeError) as e:
         logger.error(f"Error al procesar los datos JSON: {str(e)}")

@@ -3,6 +3,8 @@ from .views import *
 
 urlpatterns = [
     path('', main_view, name='main'),  # Vista principal
+    path('mainAlgebra/', mainAlgebra_view, name='mainAlgebra_view'),
+    path('mainNumAnalisis/', mainNumAnalisis_view, name='mainNumAnalisis_view'),
     #1
     path('all_gauss/', escalonar_view, name='escalonar_view'),  # Vista para Método Escalonado
     path('get-existing-ids/', get_existing_ids, name='get_existing_ids'),
@@ -31,4 +33,16 @@ urlpatterns = [
     path('multMtrX/', multMtrX_view, name='multMtrX_view'),  # Vista para cargar el formulario de transposición
     path('get_existing_ids_multMtrX/', get_existing_ids_multMtrX, name='get_existing_ids_multMtrX'),  # Vista para obtener los IDs existentes
     path('multMtrX/process/', multMtrX_process, name='multMtrX_process'),  # Vista para procesar la transposición de la matriz
+    #8
+    path('clcDeterm/', clcDeterm_view, name='clcDeterm_view'),  # Vista para cargar el formulario de transposición
+    path('get_existing_ids_clcDeterm/', get_existing_ids_clcDeterm, name='get_existing_ids_clcDeterm'),  # Vista para obtener los IDs existentes
+    path('clcDeterm/process/', clcDeterm_process, name='clcDeterm_process'),  # Vista para procesar la transposición de la matriz
+    #9
+    path('invMtrx/', invMtrx_view, name='invMtrx_view'),  # Vista para cargar el formulario de transposición
+    path('get_existing_ids_invMtrx/', get_existing_ids_invMtrx, name='get_existing_ids_invMtrx'),  # Vista para obtener los IDs existentes
+    path('invMtrx/process/', invMtrx_process, name='invMtrx_process'),  # Vista para procesar la transposición de la matriz
+    #10
+    path('RglCramer/', RglCramer_view, name='RglCramer_view'),  # Vista para cargar el formulario de transposición
+    path('get_existing_ids_RglCramer/', get_existing_ids_RglCramer, name='get_existing_ids_RglCramer'),  # Vista para obtener los IDs existentes
+    path('RglCramer/process/', RglCramer_process, name='RglCramer_process'),  # Vista para procesar la transposición de la matriz
 ]
