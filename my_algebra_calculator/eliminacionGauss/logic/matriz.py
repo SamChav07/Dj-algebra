@@ -8,11 +8,29 @@ class Matriz:
     """
 
     def __init__(self, matriz):
+        # Validar si la matriz es None
         if matriz is None:
             raise ValueError("La matriz no puede ser None.")
-        if not isinstance(matriz, list) or not all(isinstance(i, list) for i in matriz):
-            raise ValueError("La matriz debe ser una lista de listas.")
-        self.matriz = matriz
+
+        # Validar si la matriz es una lista de listas
+        if isinstance(matriz, list) and all(isinstance(i, list) for i in matriz):
+            self.matriz = matriz
+        
+        # Validar si la matriz tiene el formato del método Cramer
+        elif isinstance(matriz, dict) and 'cramer_Matrx' in matriz and 'cramer_TermsIndp' in matriz:
+            # Extraer la matriz y los términos independientes del diccionario
+            matriz_base = matriz['cramer_Matrx']
+            terminos_independientes = matriz['cramer_TermsIndp']
+
+            # Validar dimensiones
+            if len(matriz_base) != len(terminos_independientes):
+                raise ValueError("La cantidad de filas en la matriz debe coincidir con la cantidad de términos independientes.")
+
+            # Construir la matriz ampliada
+            self.matriz = [fila + [terminos_independientes[i]] for i, fila in enumerate(matriz_base)]
+        
+        else:
+            raise ValueError("Formato de matriz no reconocido. Debe ser una lista de listas o un diccionario con 'cramer_Matrx' y 'cramer_TermsIndp'.")
 
     def obtener_matriz(self, entradas):
         """

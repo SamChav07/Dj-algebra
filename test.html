@@ -1,73 +1,133 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
-    <style>
-        body {
-            background-color: #343a40; /* Fondo oscuro */
-            color: #ffffff; /* Texto en blanco */
-        }
-        .card {
-            background-color: #495057; /* Color de las tarjetas */
-            border: none; /* Sin borde */
-        }
-        .card-header {
-            background-color: #007bff; /* Color de fondo del encabezado */
-            color: #ffffff; /* Texto del encabezado en blanco */
-        }
-        .btn-primary {
-            background-color: #007bff; /* Color del botón */
-            border: none; /* Sin borde */
-        }
-        .btn-primary:hover {
-            background-color: #0056b3; /* Color del botón al pasar el ratón */
-        }
-    </style>
-    <title>Aplicación de Cálculo</title>
-</head>
-<body>
-    <div class="container mt-5">
-        <h1 class="text-center">Bienvenido a la Calculadora de Matrices</h1>
-        <div class="row">
-            <div class="col-md-4">
-                <div class="card text-center mb-4">
-                    <div class="card-header">
-                        <h3>Multiplicación de Vectores</h3>
-                    </div>
-                    <div class="card-body">
-                        <p class="card-text">Realiza la multiplicación de dos vectores.</p>
-                        <a href="#" class="btn btn-primary">Comenzar</a>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-4">
-                <div class="card text-center mb-4">
-                    <div class="card-header">
-                        <h3>Multiplicación de Matrices</h3>
-                    </div>
-                    <div class="card-body">
-                        <p class="card-text">Multiplica matrices de diferentes dimensiones.</p>
-                        <a href="#" class="btn btn-primary">Comenzar</a>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-4">
-                <div class="card text-center mb-4">
-                    <div class="card-header">
-                        <h3>Resultados</h3>
-                    </div>
-                    <div class="card-body">
-                        <p class="card-text">Visualiza los resultados de tus cálculos.</p>
-                        <a href="#" class="btn btn-primary">Ver Resultados</a>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.3/dist/umd/popper.min.js"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-</body>
-</html>
+CLASE MATRIZ MODIFICADA 
+
+class Matriz:
+    """
+    Clase que representa una matriz y permite realizar eliminación Gaussiana.
+    """
+
+    def __init__(self, matriz):
+        if matriz is None:
+            raise ValueError("La matriz no puede ser None.")
+
+        if isinstance(matriz, list) and all(isinstance(i, list) for i in matriz):
+            self.matriz = matriz
+        elif isinstance(matriz, dict) and 'cramer_Matrx' in matriz and 'cramer_TermsIndp' in matriz:
+            matriz_base = matriz['cramer_Matrx']
+            terminos_independientes = matriz['cramer_TermsIndp']
+
+            if len(matriz_base) != len(terminos_independientes):
+                raise ValueError("La cantidad de filas en la matriz debe coincidir con la cantidad de términos independientes.")
+
+            self.matriz = [fila + [terminos_independientes[i]] for i, fila in enumerate(matriz_base)]
+        else:
+            raise ValueError("Formato de matriz no reconocido. Debe ser una lista de listas o un diccionario con 'cramer_Matrx' y 'cramer_TermsIndp'.")
+
+    def obtener_matriz(self):
+        """
+        Retorna la matriz almacenada.
+        """
+        if self.matriz is None:
+            raise ValueError("La matriz no puede ser None.")
+        return self.matriz
+
+    def cramer(self, resultados, paso_a_paso=False):
+        """
+        Resuelve el sistema de ecuaciones lineales usando la regla de Cramer.
+        """
+        n = len(self.matriz)
+        if n != len(self.matriz[0]):
+            raise ValueError("La matriz debe ser cuadrada para aplicar la regla de Cramer.")
+
+        det_base, pasos_base = self.calcular_determinante(paso_a_paso=True)
+        if abs(det_base) < 1e-10:
+            raise ValueError("La matriz no puede ser resuelta por Cramer.")
+
+        soluciones = []
+        pasos = f"Determinante de la matriz base:\n{pasos_base}\n\n"
+        pasos += f"det(A) = {det_base:.2f}\n\n"
+
+        for var_idx in range(n):
+            matriz_temp = [fila[:] for fila in self.matriz]
+            for i in range(n):
+                matriz_temp[i][var_idx] = resultados[i]
+
+            det_temp, pasos_temp = Matriz(matriz_temp).calcular_determinante(paso_a_paso=True)
+            valor_variable = det_temp / det_base
+            soluciones.append(valor_variable)
+
+            if paso_a_paso:
+                pasos += f"Determinante de la matriz para x{var_idx + 1}:\n{pasos_temp}\n"
+                pasos += f"det(A_{var_idx + 1}) = {det_temp:.2f}\n"
+                pasos += f"x{var_idx + 1} = det(A_{var_idx + 1}) / det(A) = {valor_variable:.2f}\n\n"
+
+        return (soluciones, pasos) if paso_a_paso else soluciones
+
+    def calcular_determinante(self, paso_a_paso=False):
+        """
+        Calcula el determinante de la matriz utilizando eliminación Gaussiana.
+        """
+        if len(self.matriz) != len(self.matriz[0]):
+            raise ValueError("El determinante solo se puede calcular para matrices cuadradas.")
+
+        n = len(self.matriz)
+        matriz_temp = [fila[:] for fila in self.matriz]
+        determinante = 1
+        pasos = "" if paso_a_paso else None
+
+        for i in range(n):
+            max_row = max(range(i, n), key=lambda x: abs(matriz_temp[x][i]))
+            if abs(matriz_temp[max_row][i]) < 1e-10:
+                return 0, pasos if paso_a_paso else 0
+
+            if i != max_row:
+                matriz_temp[i], matriz_temp[max_row] = matriz_temp[max_row], matriz_temp[i]
+                determinante *= -1
+
+            pivote = matriz_temp[i][i]
+            determinante *= pivote
+
+            for j in range(i + 1, n):
+                factor = matriz_temp[j][i] / pivote
+                for k in range(i, n):
+                    matriz_temp[j][k] -= factor * matriz_temp[i][k]
+
+        return determinante, pasos if paso_a_paso else determinante
+
+
+        VISTA DE DJANGO ACTUALIZADA
+
+        @require_POST
+        def RglCramer_process(request):
+            try:
+                body_data = json.loads(request.body.decode('utf-8'))
+        
+                matriz_datos = body_data.get('cramer_Matrx')
+                resultados = body_data.get('cramer_TermsIndp')
+        
+                if not matriz_datos or not isinstance(matriz_datos, list) or not all(isinstance(i, list) for i in matriz_datos):
+                    return JsonResponse({'status': 'error', 'message': 'Formato de matriz no válido.'}, status=400)
+        
+                if not isinstance(resultados, list) or len(resultados) != len(matriz_datos):
+                    return JsonResponse({'status': 'error', 'message': 'El número de términos independientes debe coincidir con las filas de la matriz.'}, status=400)
+        
+                matriz = Matriz(matriz_datos)
+        
+                try:
+                    resultado = matriz.cramer(resultados)
+                except Exception as e:
+                    return JsonResponse({'status': 'error', 'message': f'Error calculando la solución: {str(e)}'}, status=500)
+        
+                instancia = RglCramer.objects.create(
+                    cramer_Matrx=matriz_datos,
+                    cramer_TermsIndp=resultados,
+                    cramer_resultado=resultado,
+                    cramer_ecuaciones="Solución calculada con la regla de Cramer."
+                )
+        
+                return JsonResponse({'status': 'success', 'resultados': resultado}, status=200)
+        
+            except json.JSONDecodeError:
+                return JsonResponse({'status': 'error', 'message': 'El cuerpo de la solicitud debe ser un JSON válido.'}, status=400)
+            except Exception as e:
+                return JsonResponse({'status': 'error', 'message': f'Ocurrió un error inesperado: {str(e)}'}, status=500)
+        

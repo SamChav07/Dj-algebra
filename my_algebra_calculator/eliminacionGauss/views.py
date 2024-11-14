@@ -23,6 +23,9 @@ def mainAlgebra_view(request):
 def mainNumAnalisis_view(request):
     return render(request, 'mainNumericoAnalisis.html')
 
+def aboutU_view(request):
+    return render(request, 'aboUs.html')
+
 #1 Vista para la eliminación de Gauss
 def escalonar_view(request):
     form = ElimGaussForm()  
@@ -547,49 +550,63 @@ def get_existing_ids_RglCramer(request):
 
 @require_POST
 def RglCramer_process(request):
-    """Procesa el cálculo usando la regla de Cramer."""
-    logger.debug("Datos POST recibidos en RglCramer_process: %s", request.body)
-
     try:
-        # Parsear los datos JSON recibidos
-        data = json.loads(request.body.decode('utf-8'))
+        # Parse JSON body
+        body_unicode = request.body.decode('utf-8')
+        body_data = json.loads(body_unicode)
 
-        # Obtener la matriz y los términos independientes desde el JSON
-        cramer_Matrx = data.get('cramer_Matrx', None)
-        cramer_TermsIndp = data.get('cramer_TermsIndp', None)
+        # Retrieve the matrix and results
+        matriz_datos = body_data.get('cramer_Matrx')
+        resultados = body_data.get('cramer_TermsIndp')
 
-        # Validaciones de datos
-        if not cramer_Matrx or not cramer_TermsIndp:
-            logger.error("Datos faltantes: cramer_Matrx o cramer_TermsIndp no proporcionados.")
-            return JsonResponse({'status': 'error', 'message': 'Se requieren los datos de la matriz y los términos independientes.'}, status=400)
+        # Validar que la matriz haya sido proporcionada
+        if not matriz_datos:
+            logger.error("cramer_Matrx no proporcionado.")
+            return JsonResponse({'status': 'error', 'message': 'La matriz no fue proporcionada.'}, status=400)
 
-        if not isinstance(cramer_Matrx, list) or not all(isinstance(row, list) for row in cramer_Matrx):
-            raise ValueError("El formato de la matriz no es válido.")
-        
-        if not isinstance(cramer_TermsIndp, list) or len(cramer_TermsIndp) != len(cramer_Matrx):
-            raise ValueError("El número de términos independientes debe coincidir con el número de filas de la matriz.")
+        # Validar que la matriz sea una lista de listas
+        if not isinstance(matriz_datos, list) or not all(isinstance(i, list) for i in matriz_datos):
+            logger.error("cramer_Matrx no es una lista de listas válida.")
+            return JsonResponse({'status': 'error', 'message': 'La matriz debe ser una lista de listas.'}, status=400)
 
-        # Crear una instancia de la clase Matriz con la matriz recibida
-        matriz_obj = Matriz(len(cramer_Matrx), cramer_Matrx)
+        # Validar los términos independientes
+        if not isinstance(resultados, list) or len(resultados) != len(matriz_datos):
+            logger.error("El número de términos independientes no coincide con el número de ecuaciones.")
+            return JsonResponse({'status': 'error', 'message': 'El número de términos independientes debe coincidir con el número de ecuaciones.'}, status=400)
 
-        # Calcular la solución usando la regla de Cramer
-        resultado, pasos = matriz_obj.cramer(cramer_TermsIndp, paso_a_paso=True)
+        # Log the received matrix (without exposing sensitive information)
+        logger.info(f"Matrix received: {matriz_datos} with {len(resultados)} independent terms.")
 
-        # Guardar el resultado en la base de datos
-        cramer_instance = RglCramer.objects.create(
-            cramer_Matrx=cramer_Matrx,
-            cramer_TermsIndp=cramer_TermsIndp,
+        # Create the matrix object
+        matriz = Matriz(matriz_datos)
+
+        # Perform the Cramer's rule calculation
+        try:
+            resultado = matriz.cramer(resultados)
+        except Exception as e:
+            logger.error(f"Error calculating with Cramer's rule: {str(e)}")
+            return JsonResponse({'status': 'error', 'message': 'Error calculando la solución usando la regla de Cramer.'}, status=500)
+
+        # Save the result to the model
+        instancia = RglCramer.objects.create(
+            cramer_Matrx=matriz_datos,
+            cramer_TermsIndp=resultados,  # Save the independent terms as well
             cramer_resultado=resultado,
-            cramer_ecuaciones=pasos
+            cramer_ecuaciones="Cálculo realizado con la regla de Cramer"
         )
 
-        logger.info("Procesamiento completado con éxito.")
-        return JsonResponse({
-            'status': 'success',
-            'resultado': resultado,
-            'pasos': pasos
-        })
+        # Return the success response
+        logger.info("Cálculo realizado exitosamente.")
+        return JsonResponse({'status': 'success', 'resultados': resultado}, status=200)
 
-    except (ValueError, json.JSONDecodeError) as e:
-        logger.error(f"Error al procesar los datos JSON: {str(e)}")
-        return JsonResponse({'status': 'error', 'message': str(e)}, status=400)
+    except json.JSONDecodeError:
+        logger.error("El cuerpo de la solicitud no es un JSON válido.")
+        return JsonResponse({'status': 'error', 'message': 'El cuerpo de la solicitud debe ser un JSON válido.'}, status=400)
+
+    except KeyError as e:
+        logger.error(f"Falta un campo requerido: {str(e)}")
+        return JsonResponse({'status': 'error', 'message': f'Falta el campo requerido: {str(e)}'}, status=400)
+
+    except Exception as e:
+        logger.exception("Ocurrió un error procesando la solicitud.")
+        return JsonResponse({'status': 'error', 'message': 'Ocurrió un error inesperado. Por favor, intente nuevamente.'}, status=500)

@@ -5,6 +5,7 @@ urlpatterns = [
     path('', main_view, name='main'),  # Vista principal
     path('mainAlgebra/', mainAlgebra_view, name='mainAlgebra_view'),
     path('mainNumAnalisis/', mainNumAnalisis_view, name='mainNumAnalisis_view'),
+    path('aboutU/', aboutU_view, name='aboutU_view'),
     #1
     path('all_gauss/', escalonar_view, name='escalonar_view'),  # Vista para Método Escalonado
     path('get-existing-ids/', get_existing_ids, name='get_existing_ids'),
