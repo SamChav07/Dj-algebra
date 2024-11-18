@@ -15,21 +15,21 @@ from .logic.matrizxvector import MxV
 logger = logging.getLogger(__name__)
 
 def main_view(request):
-    return render(request, 'main.html')
+    return render(request, 'main/main.html')
 
 def mainAlgebra_view(request):
-    return render(request, 'mainAlgebraLineal.html')
+    return render(request, 'main/mainAlgebraLineal.html')
 
 def mainNumAnalisis_view(request):
-    return render(request, 'mainNumericoAnalisis.html')
+    return render(request, 'main/mainNumericoAnalisis.html')
 
 def aboutU_view(request):
-    return render(request, 'aboUs.html')
+    return render(request, 'main/aboUs.html')
 
 #1 Vista para la eliminación de Gauss
 def escalonar_view(request):
     form = ElimGaussForm()  
-    return render(request, 'escalonar.html', {'form': form})  
+    return render(request, 'algebraLn/escalonar.html', {'form': form})  
 
 def get_existing_ids(request):
     ids = list(Elim_Gauss.objects.values_list('id', flat=True))
@@ -83,7 +83,7 @@ def escalonar_process(request):
 def combinarVectores_view(request):
     """Renderiza la plantilla combinarVectores.html con el formulario."""
     form = CombVectorForm()  # Suponiendo que tienes un formulario en Django
-    return render(request, 'combinarVectores.html', {'form': form})
+    return render(request, 'algebraLn/combinarVectores.html', {'form': form})
 
 def get_existing_idsVector(request):
     """Devuelve una respuesta JSON con los IDs existentes de las operaciones de vectores."""
@@ -130,7 +130,7 @@ def combinarVectores_process(request):
 #3 vista_filaXvector
 def filaXvector_view(request):
     form = MultiFxCForm()
-    return render(request, 'filaXvector.html', {'form': form})
+    return render(request, 'algebraLn/filaXvector.html', {'form': form})
 
 def get_existing_idsfXv(request):
     ids = list(MultiFxC.objects.values_list('id', flat=True))
@@ -180,7 +180,7 @@ def filaXvector_process(request):
 
 def propMxV_view(request):
     form = PropMxVForm()
-    return render(request, 'propMxV.html', {'form': form})
+    return render(request, 'algebraLn/propMxV.html', {'form': form})
 
 def get_existing_ids_pMxV(request):
     ids = list(PropMxV.objects.values_list('id', flat=True))
@@ -240,7 +240,7 @@ def propMxV_process(request):
 def smMrx_view(request):
     """Renderiza el formulario para la suma de matrices."""
     form = SmMrxForm()
-    return render(request, 'sumaMatrx.html', {'form': form})
+    return render(request, 'algebraLn/sumaMatrx.html', {'form': form})
 
 def get_existing_ids_smMrx(request):
     """Devuelve los IDs existentes en la tabla SmMrx."""
@@ -307,7 +307,7 @@ def smMrx_process(request):
 #6
 def trnsMtx_view(request):
     form = TrnsMtxForm()
-    return render(request, 'trnsMtrx.html', {'form': form})
+    return render(request, 'algebraLn/trnsMtrx.html', {'form': form})
 
 # 2. Vista para obtener los IDs existentes
 def get_existing_ids_trnsMtx(request):
@@ -369,7 +369,7 @@ def trnsMtx_process(request):
 #7
 def multMtrX_view(request):
     form = MultMtrXForm()
-    return render(request, 'multMtrX.html', {'form': form})
+    return render(request, 'algebraLn/multMtrX.html', {'form': form})
 
 def get_existing_ids_multMtrX(request):
     """Devuelve los IDs existentes en la tabla MultMtrX."""
@@ -424,7 +424,7 @@ def multMtrX_process(request):
 #8
 def clcDeterm_view(request):
     form = ClcDetermForm()
-    return render(request, 'calcDeterminante.html', {'form': form})
+    return render(request, 'algebraLn/calcDeterminante.html', {'form': form})
 
 # View para obtener los IDs existentes
 def get_existing_ids_clcDeterm(request):
@@ -481,7 +481,7 @@ def clcDeterm_process(request):
 #9
 def invMtrx_view(request):
     form = InvMtrxForm()
-    return render(request, 'inversaMatriz.html', {'form': form})
+    return render(request, 'algebraLn/inversaMatriz.html', {'form': form})
 
 # Vista para obtener los IDs existentes de las matrices invertidas
 def get_existing_ids_invMtrx(request):
@@ -540,7 +540,7 @@ def invMtrx_process(request):
 def RglCramer_view(request):
     # Crear una instancia del formulario
     form = RglCramerForm()
-    return render(request, 'reglaCramer.html', {'form': form})
+    return render(request, 'algebraLn/reglaCramer.html', {'form': form})
 
 def get_existing_ids_RglCramer(request):
     """Devuelve los IDs existentes en la tabla RglCramer."""
@@ -611,7 +611,7 @@ def RglCramer_process(request):
 def factLU_view(request):
     """Renderiza la página con el formulario de factorización LU."""
     form = factLUForm()
-    return render(request, 'factorizacionLU.html', {'form': form})
+    return render(request, 'algebraLn/factorizacionLU.html', {'form': form})
 
 # 2. Vista para obtener los IDs existentes en la tabla factLU
 def get_existing_ids_factLU(request):

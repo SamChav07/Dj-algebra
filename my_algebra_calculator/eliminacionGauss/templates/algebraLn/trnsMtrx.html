@@ -9,7 +9,7 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous"> 
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
-    <script src="{% static "js/CalcDeterminante.js" %}" defer></script>
+    <script src="{% static "js/js_algebra/TrnsmMtrx.js" %}" defer></script>
     <style>
         .result-container {
             background-color: #ffffff;
@@ -47,31 +47,37 @@
                 </a>
                 <form class="d-flex align-items-center">
                     <button class="btn btn-primary me-2" type="button" onclick="window.location.href='{% url "main" %}'">Inicio</button>
-                    <button class="btn btn-primary me-2" type="button" onclick="window.location.href='aboUs.html'">About Us</button>                
+                    <button class="btn btn-primary me-2" type="button" onclick="window.location.href='aboUs.html'">About Us</button>
                 </form>
             </div>
         </nav>
     </header>
 
     <div class="container mt-4 flex-grow-1">
-        <h1>Calcular Determinante</h1>
+        <h1>Transpuesta de Matriz</h1>
 
         <div class="row">
             <div class="col-md-6">
-                <form id="resolverForm" method="post" action="{% url 'clcDeterm_process' %}">
+                <!-- Formulario para ingresar dimensiones de la matriz -->
+                <form id="resolverForm" method="post" action="{% url 'trnsMtx_process' %}">
                     {% csrf_token %}
-                    
                     <div class="mb-3">
-                        <label for="id_tamMtrx" class="form-label">Tamaño de la Matriz (n x n):</label>
-                        <input type="number" id="id_tamMtrx" name="numMatrices" class="form-control" placeholder="Número de matrices" min="1" required>
+                        <label for="id_filas" class="form-label">Ecuaciones:</label>
+                        <input type="number" id="id_filas" name="filas" class="form-control" placeholder="Número de ecuaciones" min="1" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="id_columnas" class="form-label">Incógnitas:</label>
+                        <input type="number" id="id_columnas" name="columnas" class="form-control" placeholder="Número de incógnitas" min="1" required>
                     </div>
                 
-                    <button type="button" id="createMatrixInputs" class="btn btn-primary">Crear Entradas de Matrices</button>
+                    <button type="button" id="createMatrixBtn" class="btn btn-primary btn-lg w-100">Crear Matriz</button>
                 
-                    <div id="matrixInputsContainer" class="mt-4"></div>    
+                    <!-- Contenedor para mostrar la matriz -->
+                    <div id="matrixContainer" class="matrix-container mt-4"></div>
+                    
                     <!-- Botón "Resolver" -->
                     <button type="submit" class="btn btn-primary btn-lg w-100 mt-3" id="resolveBtn" style="display: none;">Guardar y Resolver</button>
-                </form>                
+                </form>
             </div>
 
             <div class="col-md-6">

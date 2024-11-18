@@ -11,7 +11,7 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
 
     <script src="//cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
-    <script src="{% static "js/ReglaCramer.js" %}" defer></script>
+    <script src="{% static "js/js_algebra/FactorizacionLU.js" %}" defer></script>
     <style>
         .result-container {
             background-color: #ffffff;
@@ -56,11 +56,11 @@
     </header>
 
     <div class="container mt-4 flex-grow-1">
-        <h1>Regla de Cramer</h1>
+        <h1>Factorización LU</h1>
 
         <div class="row">
             <div class="col-md-6">
-                <form id="resolverForm" method="post" action="{% url 'RglCramer_process' %}">
+                <form id="resolverForm" method="post" action="{% url 'factLU_process' %}">
                     {% csrf_token %}
                     
                     <div class="mb-3">
@@ -73,9 +73,9 @@
                     <div id="matrixInputsContainer" class="mt-4"></div>    
                     <!-- Botón "Resolver" -->
                     <button type="submit" class="btn btn-primary btn-lg w-100 mt-3" id="resolveBtn" style="display: none;">Guardar y Resolver</button>
-                </form>
+                </form>                
             </div>
-
+        
             <div class="col-md-6">
                 <div class="result-container">
                     <h2>Resultados</h2>
@@ -86,31 +86,55 @@
                     <!-- Pestañas -->
                     <ul class="nav nav-tabs justify-content-center mb-3" id="resultTabs">
                         <li class="nav-item">
+                            <a class="nav-link active" data-bs-toggle="tab" href="#tabL">L</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" data-bs-toggle="tab" href="#tabU">U</a>
+                        </li>
+                        <li class="nav-item">
                             <a class="nav-link" data-bs-toggle="tab" href="#tabSolucion">Solución</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" data-bs-toggle="tab" href="#tabPasosF">Pasos Detallados</a>
+                            <a class="nav-link" data-bs-toggle="tab" href="#tabPasosF">PasosF</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" data-bs-toggle="tab" href="#tabPasosR">PasosR</a>
                         </li>
                     </ul>
 
                     <!-- Contenido de las Pestañas -->
                     <div class="tab-content mt-3">
+                        <div id="tabL" class="tab-pane fade show active">
+                            <!-- Aquí se mostrará la matriz L -->
+                            <pre id='resultTextL'>Aquí aparecerán los resultados de L.</pre>
+                        </div>
+                        <div id='tabU' class='tab-pane fade'>
+                            <!-- Aquí se mostrará la matriz U -->
+                            <pre id='resultTextU'>Aquí aparecerán los resultados de U.</pre>
+                        </div>
                         <div id='tabSolucion' class='tab-pane fade'>
                             <!-- Aquí se mostrará la solución -->
-                            <pre id='resultTextSolucion'>Aquí aparecerán la solución.</pre>
+                            <pre id='resultTextSolucion'>Aquí aparecerán los resultados de la solución.</pre>
                         </div>
                         <div id='tabPasosF' class='tab-pane fade'>
                             <!-- Aquí se mostrarán los pasos de factorización -->
-                            <pre id='resultTextPasosF'>Aquí aparecerán los pasos detallados.</pre>
+                            <pre id='resultTextPasosF'>Aquí aparecerán los pasos de la factorización.</pre>
+                        </div>
+                        <div id='tabPasosR' class='tab-pane fade'>
+                            <!-- Aquí se mostrarán los pasos de resolución -->
+                            <pre id='resultTextPasosR'>Aquí aparecerán los pasos de la resolución.</pre>
                         </div>
                     </div>
+
                 </div> <!-- Fin result-container -->
             </div> <!-- Fin col-md-6 -->
-        </div>
-    </div>
+        </div> <!-- Fin row -->
+    </div> <!-- Fin container -->
 
-    <footer class="text-center py-4 bg-body-tertiary">
+    <!-- Footer -->
+    <footer class='text-center py-4 bg-body-tertiary'>
         <p>&copy; 2024 My Algebra Calculator</p>
     </footer>
+
 </body>
 </html>

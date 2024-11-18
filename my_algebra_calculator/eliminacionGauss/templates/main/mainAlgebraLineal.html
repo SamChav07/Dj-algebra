@@ -8,6 +8,8 @@
         <title>CalcX</title>
 
         <script src="https://getbootstrap.com/docs/5.3/assets/js/color-modes.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>        
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
         <link rel="canonical" href="https://getbootstrap.com/docs/5.3/examples/product/">
         <!-- DocSearch CSS -->
         <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@docsearch/css@3">
@@ -169,12 +171,13 @@
         <nav class="navbar navbar-expand-md bg-dark sticky-top border-bottom" data-bs-theme="dark">
             <div class="container">
                 <a class="navbar-brand d-md-none" href="#">
-                <svg class="bi" width="24" height="24"><use xlink:href="#aperture"/></svg>
-                Aperture
+                    <svg class="bi" width="24" height="24"><use xlink:href="#aperture"/></svg>
+                    Aperture
                 </a>
                 <button class="navbar-toggler" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvas" aria-controls="offcanvas" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
+                    <span class="navbar-toggler-icon"></span>
                 </button>
+                
                 <div class="offcanvas offcanvas-end" tabindex="-1" id="offcanvas" aria-labelledby="offcanvasLabel">
                     <div class="offcanvas-header">
                         <h5 class="offcanvas-title" id="offcanvasLabel">Aperture</h5>
@@ -182,14 +185,21 @@
                     </div>
                     <div class="offcanvas-body">
                         <ul class="navbar-nav flex-grow-1 justify-content-between">
-                        <li class="nav-item"><a class="nav-link" href="#">
-                            <svg class="bi" width="24" height="24"><use xlink:href="#aperture"/></svg>
-                        </a></li>
-                            <li class="nav-item"><a class="nav-link" href="#">Inicio</a></li>
-                            <li class="nav-item"><a class="nav-link" href="#">Tour</a></li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="#">
+                                    <svg class="bi" width="24" height="24"><use xlink:href="#aperture"/></svg>
+                                </a>
+                            </li>
+                            <li class="nav-item"><a class="nav-link" href="{% url 'main' %}">Inicio</a></li>
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">Cursos</a>
+                                <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+                                    <li><a class="dropdown-item" href="#">Álgebra</a></li>
+                                    <li><a class="dropdown-item" href="{% url "mainNumAnalisis_view" %}">Análisis</a></li>
+                                </ul>
+                            </li>
                             <li class="nav-item"><a class="nav-link" href="#">Product</a></li>
-                            <li class="nav-item"><a class="nav-link" href="#">About Us</a></li>
-                        </a></li>
+                            <li class="nav-item"><a class="nav-link" href="{% url "aboutU_view" %}">About Us</a></li>
                         </ul>
                     </div>
                 </div>
@@ -199,15 +209,17 @@
         <main>
             <div class="position-relative overflow-hidden p-3 p-md-5 m-md-3 text-center bg-body-tertiary">
                 <div class="col-md-6 p-lg-5 mx-auto my-5">
-                    <h1 class="display-3 fw-bold">Algebra Lineal</h1>
-                    <h3 class="fw-normal text-muted mb-3">Solve complex algebraic problems effortlessly with calcX</h3>
+                    <a href="{% url 'mainAlgebra_view' %}" style="text-decoration: none; color: inherit;">
+                        <h1 class="display-3 fw-bold">Algebra Lineal</h1>
+                        <h3 class="fw-normal text-muted mb-3">Solve complex algebraic problems effortlessly with calcX</h3>
+                    </a>                    
                     <div class="d-flex gap-3 justify-content-center lead fw-normal">
-                        <a class="icon-link" href="#">
-                        Matrices
+                        <a href="#" class="icon-link" onclick="filterContent('matrices')">
+                        <h3>Matrices</h3>
                         <svg class="bi"><use xlink:href="#chevron-right"/></svg>
                         </a>
-                        <a class="icon-link" href="#">
-                        Vectores
+                        <a href="#" class="icon-link" onclick="filterContent('vectores')">
+                        <h3>Vectores</h3>
                         <svg class="bi"><use xlink:href="#chevron-right"/></svg>
                         </a>
                     </div>
@@ -216,124 +228,140 @@
                 <div class="product-device product-device-2 shadow-sm d-none d-md-block"></div>
             </div>
 
-            <div class="d-md-flex flex-md-equal w-100 my-md-3 ps-md-3">
-                <a href="{% url "escalonar_view" %}" class="text-decoration-none">
-                    <div class="text-bg-dark me-md-3 pt-3 px-3 pt-md-5 px-md-5 text-center overflow-hidden">
-                        <div class="my-3 py-3">
-                            <h2 class="display-5">Método Escalonado</h2>
-                            <p class="lead">Una técnica sistemática para transformar la matriz del sistema en su forma escalonada por filas.</p>
+            <div id="contentContainer">
+                <div class="d-md-flex flex-md-equal w-100 my-md-3 ps-md-3">
+                    <a href="{% url "escalonar_view" %}" class="text-decoration-none content_item matrices">
+                        <div class="text-bg-dark me-md-3 pt-3 px-3 pt-md-5 px-md-5 text-center overflow-hidden">
+                            <div class="my-3 py-3">
+                                <h2 class="display-5">Método Escalonado</h2>
+                                <p class="lead">Una técnica sistemática para transformar la matriz del sistema en su forma escalonada por filas.</p>
+                            </div>
+                            <div class="bg-body-tertiary shadow-sm mx-auto" style="width: 80%; height: 300px; border-radius: 21px 21px 0 0;"></div>
                         </div>
-                        <div class="bg-body-tertiary shadow-sm mx-auto" style="width: 80%; height: 300px; border-radius: 21px 21px 0 0;"></div>
-                    </div>
-                </a>
+                    </a>
 
-                <a href="{% url "combinarVectores_view" %}" class="text-decoration-none"> 
-                    <div class="bg-body-tertiary me-md-3 pt-3 px-3 pt-md-5 px-md-5 text-center overflow-hidden">
-                        <div class="my-3 p-3">
-                            <h2 class="display-5">Operaciones combinadas de Vectores</h2>
-                            <p class="lead">Formas de manipular y combinar vectores en álgebra lineal.</p>
+                    <a href="{% url "combinarVectores_view" %}" class="text-decoration-none content_item vectores" st> 
+                        <div class="bg-body-tertiary me-md-3 pt-3 px-3 pt-md-5 px-md-5 text-center overflow-hidden">
+                            <div class="my-3 p-3">
+                                <h2 class="display-5">Operaciones combinadas de Vectores</h2>
+                                <p class="lead">Formas de manipular y combinar vectores en álgebra lineal.</p>
+                            </div>
+                            <div class="bg-dark shadow-sm mx-auto" style="width: 80%; height: 300px; border-radius: 21px 21px 0 0;"></div>
                         </div>
-                        <div class="bg-dark shadow-sm mx-auto" style="width: 80%; height: 300px; border-radius: 21px 21px 0 0;"></div>
-                    </div>
-                </a>
-            </div>
+                    </a>
+                </div>
 
-            <div class="d-md-flex flex-md-equal w-100 my-md-3 ps-md-3">
-                <a href="{% url "filaXvector_view" %}" class="text-decoration-none"> 
-                    <div class="bg-body-tertiary me-md-3 pt-3 px-3 pt-md-5 px-md-5 text-center overflow-hidden">
-                        <div class="my-3 p-3">
-                            <h2 class="display-5">Multiplicación Vector Fila x Columna</h2>
-                            <p class="lead">Una operación fundamental en álgebra lineal que da como resultado un escalar.</p>
+                <div class="d-md-flex flex-md-equal w-100 my-md-3 ps-md-3">
+                    <a href="{% url "filaXvector_view" %}" class="text-decoration-none content_item vectores"> 
+                        <div class="bg-body-tertiary me-md-3 pt-3 px-3 pt-md-5 px-md-5 text-center overflow-hidden">
+                            <div class="my-3 p-3">
+                                <h2 class="display-5">Multiplicación Vector Fila x Columna</h2>
+                                <p class="lead">Una operación fundamental en álgebra lineal que da como resultado un escalar.</p>
+                            </div>
+                            <div class="bg-dark shadow-sm mx-auto" style="width: 80%; height: 300px; border-radius: 21px 21px 0 0;"></div>
                         </div>
-                        <div class="bg-dark shadow-sm mx-auto" style="width: 80%; height: 300px; border-radius: 21px 21px 0 0;"></div>
-                    </div>
-                </a>
-                <a href="{% url "propMxV_view" %}" class="text-decoration-none"> 
-                    <div class="text-bg-primary me-md-3 pt-3 px-3 pt-md-5 px-md-5 text-center overflow-hidden">
-                        <div class="my-3 py-3">
-                            <h2 class="display-5">Producto Matriz por Vector y Propiedad</h2>
-                            <p class="lead">And an even wittier subheading.</p>
+                    </a>
+                    <a href="{% url "propMxV_view" %}" class="text-decoration-none content_item matrices content_item vectores"> 
+                        <div class="text-bg-primary me-md-3 pt-3 px-3 pt-md-5 px-md-5 text-center overflow-hidden">
+                            <div class="my-3 py-3">
+                                <h2 class="display-5">Producto Matriz por Vector y Propiedad</h2>
+                                <p class="lead">And an even wittier subheading.</p>
+                            </div>
+                            <div class="bg-body-tertiary shadow-sm mx-auto" style="width: 80%; height: 300px; border-radius: 21px 21px 0 0;"></div>
                         </div>
-                        <div class="bg-body-tertiary shadow-sm mx-auto" style="width: 80%; height: 300px; border-radius: 21px 21px 0 0;"></div>
-                    </div>
-                </a>
-            </div>
+                    </a>
+                </div>
 
-            <div class="d-md-flex flex-md-equal w-100 my-md-3 ps-md-3">
-                <a href="{% url "smMrx_view" %}" class="text-decoration-none"> 
-                    <div class="text-bg-dark me-md-3 pt-3 px-3 pt-md-5 px-md-5 text-center overflow-hidden">
-                        <div class="my-3 p-3">
-                            <h2 class="display-5">Suma de Matrices</h2>
-                            <p class="lead">And an even wittier subheading.</p>
+                <div class="d-md-flex flex-md-equal w-100 my-md-3 ps-md-3">
+                    <a href="{% url "smMrx_view" %}" class="text-decoration-none content_item matrices"> 
+                        <div class="text-bg-dark me-md-3 pt-3 px-3 pt-md-5 px-md-5 text-center overflow-hidden">
+                            <div class="my-3 p-3">
+                                <h2 class="display-5">Suma de Matrices</h2>
+                                <p class="lead">And an even wittier subheading.</p>
+                            </div>
+                            <div class="bg-body-tertiary shadow-sm mx-auto" style="width: 80%; height: 300px; border-radius: 21px 21px 0 0;"></div>
                         </div>
-                        <div class="bg-body-tertiary shadow-sm mx-auto" style="width: 80%; height: 300px; border-radius: 21px 21px 0 0;"></div>
-                    </div>
-                </a>
-                <a href="{% url "trnsMtx_view" %}" class="text-decoration-none"> 
-                    <div class="bg-body-tertiary me-md-3 pt-3 px-3 pt-md-5 px-md-5 text-center overflow-hidden">
-                        <div class="my-3 py-3">
-                            <h2 class="display-5">Transpuesta de Matriz</h2>
-                            <p class="lead">And an even wittier subheading.</p>
+                    </a>
+                    <a href="{% url "trnsMtx_view" %}" class="text-decoration-none content_item matrices"> 
+                        <div class="bg-body-tertiary me-md-3 pt-3 px-3 pt-md-5 px-md-5 text-center overflow-hidden">
+                            <div class="my-3 py-3">
+                                <h2 class="display-5">Transpuesta de Matriz</h2>
+                                <p class="lead">And an even wittier subheading.</p>
+                            </div>
+                            <div class="bg-body shadow-sm mx-auto" style="width: 80%; height: 300px; border-radius: 21px 21px 0 0;"></div>
                         </div>
-                        <div class="bg-body shadow-sm mx-auto" style="width: 80%; height: 300px; border-radius: 21px 21px 0 0;"></div>
-                    </div>
-                </a>
-            </div>
+                    </a>
+                </div>
 
-            <div class="d-md-flex flex-md-equal w-100 my-md-3 ps-md-3">
-                <a href="{% url "multMtrX_view" %}" class="text-decoration-none"> 
-                    <div class="bg-body-tertiary me-md-3 pt-3 px-3 pt-md-5 px-md-5 text-center overflow-hidden">
-                        <div class="my-3 p-3">
-                            <h2 class="display-5">Multiplicación de Matrices</h2>
-                            <p class="lead">And an even wittier subheading.</p>
+                <div class="d-md-flex flex-md-equal w-100 my-md-3 ps-md-3">
+                    <a href="{% url "multMtrX_view" %}" class="text-decoration-none content_item matrices"> 
+                        <div class="bg-body-tertiary me-md-3 pt-3 px-3 pt-md-5 px-md-5 text-center overflow-hidden">
+                            <div class="my-3 p-3">
+                                <h2 class="display-5">Multiplicación de Matrices</h2>
+                                <p class="lead">And an even wittier subheading.</p>
+                            </div>
+                            <div class="bg-body shadow-sm mx-auto" style="width: 80%; height: 300px; border-radius: 21px 21px 0 0;"></div>
                         </div>
-                        <div class="bg-body shadow-sm mx-auto" style="width: 80%; height: 300px; border-radius: 21px 21px 0 0;"></div>
-                    </div>
-                </a>
-                <a href="{% url "clcDeterm_view" %}" class="text-decoration-none"> 
-                    <div class="text-bg-dark me-md-3 pt-3 px-3 pt-md-5 px-md-5 text-center overflow-hidden">
-                        <div class="my-3 py-3">
-                            <h2 class="display-5">Calcular Determinante</h2>
-                            <p class="lead">And an even wittier subheading.</p>
+                    </a>
+                    <a href="{% url "clcDeterm_view" %}" class="text-decoration-none content_item matrices"> 
+                        <div class="text-bg-dark me-md-3 pt-3 px-3 pt-md-5 px-md-5 text-center overflow-hidden">
+                            <div class="my-3 py-3">
+                                <h2 class="display-5">Calcular Determinante</h2>
+                                <p class="lead">And an even wittier subheading.</p>
+                            </div>
+                            <div class="bg-body-tertiary shadow-sm mx-auto" style="width: 80%; height: 300px; border-radius: 21px 21px 0 0;"></div>
                         </div>
-                        <div class="bg-body-tertiary shadow-sm mx-auto" style="width: 80%; height: 300px; border-radius: 21px 21px 0 0;"></div>
-                    </div>
-                </a>
-            </div>
+                    </a>
+                </div>
 
-            <div class="d-md-flex flex-md-equal w-100 my-md-3 ps-md-3">
-                <a href="{% url "invMtrx_view" %}" class="text-decoration-none"> 
-                    <div class="text-bg-dark me-md-3 pt-3 px-3 pt-md-5 px-md-5 text-center overflow-hidden">
-                        <div class="my-3 p-3">
-                            <h2 class="display-5">Calcular Inversa de la Matriz</h2>
-                            <p class="lead">And an even wittier subheading.</p>
+                <div class="d-md-flex flex-md-equal w-100 my-md-3 ps-md-3">
+                    <a href="{% url "invMtrx_view" %}" class="text-decoration-none content_item matrices"> 
+                        <div class="text-bg-dark me-md-3 pt-3 px-3 pt-md-5 px-md-5 text-center overflow-hidden">
+                            <div class="my-3 p-3">
+                                <h2 class="display-5">Calcular Inversa de la Matriz</h2>
+                                <p class="lead">And an even wittier subheading.</p>
+                            </div>
+                            <div class="bg-body-tertiary shadow-sm mx-auto" style="width: 80%; height: 300px; border-radius: 21px 21px 0 0;"></div>
                         </div>
-                        <div class="bg-body-tertiary shadow-sm mx-auto" style="width: 80%; height: 300px; border-radius: 21px 21px 0 0;"></div>
-                    </div>
-                </a>
-                <a href="{% url "RglCramer_view" %}" class="text-decoration-none"> 
-                    <div class="bg-body-tertiary me-md-3 pt-3 px-3 pt-md-5 px-md-5 text-center overflow-hidden">
-                        <div class="my-3 py-3">
-                            <h2 class="display-5">Regla de Cramer</h2>
-                            <p class="lead">And an even wittier subheading.</p>
+                    </a>
+                    <a href="{% url "RglCramer_view" %}" class="text-decoration-none content_item matrices"> 
+                        <div class="bg-body-tertiary me-md-3 pt-3 px-3 pt-md-5 px-md-5 text-center overflow-hidden">
+                            <div class="my-3 py-3">
+                                <h2 class="display-5">Regla de Cramer</h2>
+                                <p class="lead">And an even wittier subheading.</p>
+                            </div>
+                            <div class="bg-body shadow-sm mx-auto" style="width: 80%; height: 300px; border-radius: 21px 21px 0 0;"></div>
                         </div>
-                        <div class="bg-body shadow-sm mx-auto" style="width: 80%; height: 300px; border-radius: 21px 21px 0 0;"></div>
-                    </div>
-                </a>
-            </div>
-            <div class="d-md-flex flex-md-equal w-100 my-md-3 ps-md-3">
-                <a href="{% url "factLU_view" %}" class="text-decoration-none"> 
-                    <div class="bg-body-tertiary me-md-3 pt-3 px-3 pt-md-5 px-md-5 text-center overflow-hidden">
-                        <div class="my-3 p-3">
-                            <h2 class="display-5">Facturación LU</h2>
-                            <p class="lead">And an even wittier subheading.</p>
+                    </a>
+                </div>
+                <div class="d-md-flex flex-md-equal w-100 my-md-3 ps-md-3">
+                    <a href="{% url "factLU_view" %}" class="text-decoration-none content_item matrices"> 
+                        <div class="bg-body-tertiary me-md-3 pt-3 px-3 pt-md-5 px-md-5 text-center overflow-hidden">
+                            <div class="my-3 p-3">
+                                <h2 class="display-5">Facturación LU</h2>
+                                <p class="lead">And an even wittier subheading.</p>
+                            </div>
+                            <div class="bg-body shadow-sm mx-auto" style="width: 80%; height: 300px; border-radius: 21px 21px 0 0;"></div>
                         </div>
-                        <div class="bg-body shadow-sm mx-auto" style="width: 80%; height: 300px; border-radius: 21px 21px 0 0;"></div>
-                    </div>
-                </a>
-
+                    </a>
+                </div>
             </div>
         </main>
+
+        <script>
+            // Función para filtrar el contenido
+            function filterContent(type) {
+                const items = document.querySelectorAll('.content_item');
+                
+                items.forEach(item => {
+                    if (item.classList.contains(type)) {
+                        item.style.display = 'block'; // Muestra el elemento
+                    } else {
+                        item.style.display = 'none'; // Oculta el elemento
+                    }
+                });
+            }
+        </script>
 
         <footer class="container py-5">
             <div class="row">
