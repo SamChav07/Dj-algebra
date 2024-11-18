@@ -5,22 +5,22 @@ document.addEventListener('DOMContentLoaded', function () {
     const resolverForm = document.getElementById('resolverForm');
 
     // Event listener for creating the matrix
-createMatrixBtn.addEventListener('click', function () {
-    const filas = parseInt(document.getElementById('id_filas').value);
-    let columnas = parseInt(document.getElementById('id_columnas').value); // Add an extra column
+    createMatrixBtn.addEventListener('click', function () {
+        const filas = parseInt(document.getElementById('id_filas').value);
+        let columnas = parseInt(document.getElementById('id_columnas').value); // Add an extra column
 
-    // Clear previous matrix container
-    matrixContainer.innerHTML = '';
+        // Clear previous matrix container
+        matrixContainer.innerHTML = '';
 
-    // Validate inputs
-    if (!validarEntradas(filas, columnas)) return; 
+        // Validate inputs
+        if (!validarEntradas(filas, columnas)) return; 
 
-    // Create and display the matrix
-    crearMatriz(filas, columnas);
+        // Create and display the matrix
+        crearMatriz(filas, columnas);
 
-    // Show the "Resolve" button
-    resolveBtn.style.display = 'block';
-});
+        // Show the "Resolve" button
+        resolveBtn.style.display = 'block';
+    });
 
     // Function to fetch existing table IDs and assign a new one
     async function fetchNewTableId() {

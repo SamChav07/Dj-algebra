@@ -4,8 +4,8 @@ import logging
 import json
 from django.shortcuts import render
 from django.http import JsonResponse
-from .models import Elim_Gauss, Ope_combinadas, MultiFxC, PropMxV, SmMrx, TrnsMtx, multMtrX, ClcDeterm, InvMtrx, RglCramer
-from .forms import ElimGaussForm, CombVectorForm, MultiFxCForm, PropMxVForm, SmMrxForm, TrnsMtxForm, MultMtrXForm, ClcDetermForm, InvMtrxForm, RglCramerForm
+from .models import Elim_Gauss, Ope_combinadas, MultiFxC, PropMxV, SmMrx, TrnsMtx, multMtrX, ClcDeterm, InvMtrx, RglCramer, factLU
+from .forms import ElimGaussForm, CombVectorForm, MultiFxCForm, PropMxVForm, SmMrxForm, TrnsMtxForm, MultMtrXForm, ClcDetermForm, InvMtrxForm, RglCramerForm, factLUForm
 from django.views.decorators.http import require_POST
 from .logic.matriz import Matriz
 from .logic.vector import Vector
@@ -610,3 +610,76 @@ def RglCramer_process(request):
     except Exception as e:
         logger.exception("Ocurrió un error procesando la solicitud.")
         return JsonResponse({'status': 'error', 'message': 'Ocurrió un error inesperado. Por favor, intente nuevamente.'}, status=500)
+
+def factLU_view(request):
+    """Renderiza la página con el formulario de factorización LU."""
+    form = factLUForm()
+    return render(request, 'factorizacionLU.html', {'form': form})
+
+# 2. Vista para obtener los IDs existentes en la tabla factLU
+def get_existing_ids_factLU(request):
+    """Devuelve los IDs existentes en la tabla factLU."""
+    ids = list(factLU.objects.values_list('id', flat=True))
+    return JsonResponse({'ids': ids})
+
+@require_POST
+def factLU_process(request):
+    logger.debug(f"Request POST data: {request.POST}")
+
+    form = factLUForm(request.POST)
+
+    matriz_datos = request.POST.get('lu_mtrx')
+    if not matriz_datos:
+        logger.error("Matrix not provided")
+        return JsonResponse({'status': 'error', 'message': 'lu_mtrx no proporcionado.'}, status=400)
+
+    if form.is_valid():
+        try:
+            # Convertir datos de matriz de JSON a lista
+            matriz_json = json.loads(matriz_datos)
+            if not isinstance(matriz_json, list) or not all(isinstance(row, list) for row in matriz_json):
+                raise ValueError("La matriz debe ser una lista de listas.")
+
+            # Separar matriz A y vector b
+            matriz_a = [row[:-1] for row in matriz_json]  # Todos los elementos excepto el último de cada fila
+            vector_b = [row[-1] for row in matriz_json]   # Último elemento de cada fila
+
+            # Validar dimensiones
+            if not all(len(row) == len(matriz_a) + 1 for row in matriz_json):
+                raise ValueError("Las dimensiones de la matriz no son válidas. Asegúrate de que sea n x (n+1).")
+
+            # Resolver factorización LU
+            matriz = Matriz(matriz_a)  # Crear instancia de clase Matriz con A
+            L, U, pasos_lu = matriz.factorizacion_lu(paso_a_paso=True)  # Factorización LU con pasos
+            solucion, pasos_resolucion = matriz.resolver_lu(vector_b, paso_a_paso=True)  # Resolver Ax = b
+
+            logger.info("LU operation completed successfully.")
+
+            # Preparar respuesta JSON
+            resultados = {
+                'L': L.matriz,  # Convertir matriz L a lista
+                'U': U.matriz,  # Convertir matriz U a lista
+                'solucion': solucion,
+                'pasos_factorizacion': pasos_lu,
+                'pasos_resolucion': pasos_resolucion,
+            }
+            return JsonResponse({'status': 'success', 'resultados': resultados})
+
+        except json.JSONDecodeError:
+            logger.error("lu_mtrx no es un JSON válido.")
+            return JsonResponse({'status': 'error', 'message': 'lu_mtrx no es un JSON válido.'}, status=400)
+        except ValueError as e:
+            logger.error(f"Error processing matrix data: {str(e)}")
+            return JsonResponse({'status': 'error', 'message': str(e)}, status=400)
+        except Exception as e:
+            logger.error(f"Unexpected error: {str(e)}")
+            return JsonResponse({'status': 'error', 'message': f"Error inesperado: {str(e)}"}, status=500)
+
+    # Manejo de errores de formulario
+    errors = []
+    for field, error_list in form.errors.items():
+        for error in error_list:
+            errors.append(f"{field}: {error}")
+
+    logger.warning("Form validation failed: %s", errors)
+    return JsonResponse({'status': 'error', 'message': 'Formulario no válido.', 'errors': errors}, status=400)

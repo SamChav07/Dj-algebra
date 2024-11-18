@@ -8,29 +8,13 @@ class Matriz:
     """
 
     def __init__(self, matriz):
-        # Validar si la matriz es None
         if matriz is None:
             raise ValueError("La matriz no puede ser None.")
-
-        # Validar si la matriz es una lista de listas
         if isinstance(matriz, list) and all(isinstance(i, list) for i in matriz):
             self.matriz = matriz
-        
-        # Validar si la matriz tiene el formato del método Cramer
-        elif isinstance(matriz, dict) and 'cramer_Matrx' in matriz and 'cramer_TermsIndp' in matriz:
-            # Extraer la matriz y los términos independientes del diccionario
-            matriz_base = matriz['cramer_Matrx']
-            terminos_independientes = matriz['cramer_TermsIndp']
-
-            # Validar dimensiones
-            if len(matriz_base) != len(terminos_independientes):
-                raise ValueError("La cantidad de filas en la matriz debe coincidir con la cantidad de términos independientes.")
-
-            # Construir la matriz ampliada
-            self.matriz = [fila + [terminos_independientes[i]] for i, fila in enumerate(matriz_base)]
-        
         else:
-            raise ValueError("Formato de matriz no reconocido. Debe ser una lista de listas o un diccionario con 'cramer_Matrx' y 'cramer_TermsIndp'.")
+            raise ValueError("Formato de matriz no reconocido. Debe ser una lista de listas.")
+
 
     def obtener_matriz(self, entradas):
         """
@@ -405,7 +389,7 @@ class Matriz:
 
     def factorizacion_lu(self, paso_a_paso=False):
         """
-        Realiza la factorización LU de la matriz A (sin pivoteo) mostrando los pasos de manera visual y detallada.
+        Realiza la factorización LU de la matriz A (sin pivoteo).
         :param paso_a_paso: si es True, muestra los pasos de la factorización.
         :return: tupla con matrices L y U, y los pasos si paso_a_paso es True.
         """
@@ -450,11 +434,13 @@ class Matriz:
                     pasos += formatear_matriz_visual(U, "U") + "\n"
                     pasos += "-" * 30 + "\n"  # Separador visual
 
-        return (Matriz(n, L), Matriz(n, U), pasos) if paso_a_paso else (Matriz(n, L), Matriz(n, U))
-    
+        L_obj = Matriz(L)
+        U_obj = Matriz(U)
+        return (L_obj, U_obj, pasos) if paso_a_paso else (L_obj, U_obj)
+
     def resolver_lu(self, b, paso_a_paso=False):
         """
-        Resuelve el sistema Ax = b utilizando la factorización LU, mostrando los pasos de manera visual.
+        Resuelve el sistema Ax = b utilizando la factorización LU.
         :param b: vector de términos independientes.
         :param paso_a_paso: si es True, muestra los pasos de la resolución.
         :return: solución del sistema.

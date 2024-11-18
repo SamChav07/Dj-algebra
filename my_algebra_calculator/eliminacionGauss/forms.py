@@ -135,3 +135,14 @@ class RglCramerForm(forms.ModelForm):
             'cramer_Matrx': 'Matriz (en formato JSON)',
             'cramer_TermsIndp': 'Terminos Independientes (en formato JSON)',
         }
+
+class factLUForm(forms.ModelForm):
+    class Meta:
+        model = factLU
+        fields = ['lu_mtrx']
+        widgets = {
+            'lu_mtrx': forms.Textarea(attrs={'rows': 10, 'cols': 40, 'placeholder': 'Ejemplo: [[1, 2], [3, 4]]'}),        
+        }
+        labels = {
+            'lu_mtrx': 'Matriz (en formato JSON)',
+        }

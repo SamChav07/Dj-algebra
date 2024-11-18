@@ -86,4 +86,11 @@ class RglCramer(models.Model):
     cramer_resultado = models.JSONField(null=True, blank=True) 
     cramer_ecuaciones = models.TextField(null=True, blank=True)
     def __str__(self):
-        return f"InvMtrx {self.id}"
+        return f"RglCramer {self.id}"
+
+class factLU(models.Model):
+    lu_mtrx = models.JSONField()
+    lu_resultado = models.JSONField(null=True, blank=True) 
+    lu_ecuaciones = models.JSONField(null=True, blank=True) 
+    def __str__(self):
+        return f"self.factLU {self.id}"

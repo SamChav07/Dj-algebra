@@ -33,6 +33,10 @@ document.addEventListener('DOMContentLoaded', function () {
             const matriz = obtenerMatriz();
             const termsIndp = obtenerTerminosIndependientes();
 
+            // Log the matrix and terms being sent for debugging
+            console.log('Matriz:', matriz);
+            console.log('Términos Independientes:', termsIndp);
+
             // Prepare data to send
             const datosAEnviar = {
                 cramer_Matrx: matriz,  // Send the matrix as a list of lists
@@ -40,12 +44,10 @@ document.addEventListener('DOMContentLoaded', function () {
             };
 
             // Check if the matrix is valid
-            if (JSON.stringify(datosAEnviar.cramer_Matrx) === '[]' || datosAEnviar.cramer_TermsIndp.length === 0) {
+            if (matriz.length === 0 || termsIndp.length === 0) {
                 alert('La matriz o los términos independientes no son válidos.');
-                return; // Exit the function if the matrix is invalid
+                return; // Exit the function if the matrix or terms are invalid
             }
-
-            console.log('Datos a enviar:', datosAEnviar); // Log data being sent
 
             const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value; // Get CSRF token
 

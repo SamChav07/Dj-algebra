@@ -46,4 +46,8 @@ urlpatterns = [
     path('RglCramer/', RglCramer_view, name='RglCramer_view'),  # Vista para cargar el formulario de transposición
     path('get_existing_ids_RglCramer/', get_existing_ids_RglCramer, name='get_existing_ids_RglCramer'),  # Vista para obtener los IDs existentes
     path('RglCramer/process/', RglCramer_process, name='RglCramer_process'),  # Vista para procesar la transposición de la matriz
+    #11
+    path('factLU/', factLU_view, name='factLU_view'),  # Vista para cargar el formulario de transposición
+    path('get_existing_ids_factLU/', get_existing_ids_factLU, name='get_existing_ids_factLU'),  # Vista para obtener los IDs existentes
+    path('factLU/process/', factLU_process, name='factLU_process'),  # Vista para procesar la transposición de la matriz
 ]
