@@ -82,7 +82,6 @@ class InvMtrx(models.Model):
 #Calculo Sistema con Regla de Cramer
 class RglCramer(models.Model):
     cramer_Matrx = models.JSONField()
-    cramer_TermsIndp = models.JSONField()
     cramer_resultado = models.JSONField(null=True, blank=True) 
     cramer_ecuaciones = models.TextField(null=True, blank=True)
     def __str__(self):

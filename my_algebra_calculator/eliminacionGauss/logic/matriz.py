@@ -15,7 +15,6 @@ class Matriz:
         else:
             raise ValueError("Formato de matriz no reconocido. Debe ser una lista de listas.")
 
-
     def obtener_matriz(self, entradas):
         """
         Convierte las entradas en formato de lista de listas a una matriz de números flotantes.
@@ -358,16 +357,20 @@ class Matriz:
         n = len(self.matriz)
         if n != len(self.matriz[0]):
             raise ValueError("La matriz debe ser cuadrada para aplicar la regla de Cramer.")
-        
+
+        # Verificar que la longitud de resultados coincida con el tamaño de la matriz
+        if len(resultados) != n:
+            raise ValueError("El vector de resultados debe tener la misma longitud que el número de filas en la matriz.")
+
         # Calcular el determinante de la matriz base
         det_base, pasos_base = self.calcular_determinante(paso_a_paso=True)
         if abs(det_base) < 1e-10:
-            raise ValueError("La matriz no puede ser resuelta por Cramer.")
-        
+            raise ValueError("La matriz no puede ser resuelta por Cramer porque su determinante es cero.")
+
         soluciones = []
         pasos = f"Determinante de la matriz base:\n{pasos_base}\n\n"
         pasos += f"det(A) = {det_base:.2f}\n\n"
-        
+
         for var_idx in range(n):
             # Crear la matriz temporal reemplazando la columna var_idx con el vector de resultados
             matriz_temp = [fila[:] for fila in self.matriz]
@@ -375,10 +378,10 @@ class Matriz:
                 matriz_temp[i][var_idx] = resultados[i]
 
             # Calcular el determinante de la matriz temporal
-            det_temp, pasos_temp = Matriz(n, matriz_temp).calcular_determinante(paso_a_paso=True)
+            det_temp, pasos_temp = Matriz(matriz_temp).calcular_determinante(paso_a_paso=True)
             valor_variable = det_temp / det_base
             soluciones.append(valor_variable)
-            
+
             # Añadir pasos al texto final si paso_a_paso es True
             if paso_a_paso:
                 pasos += f"Determinante de la matriz para x{var_idx + 1}:\n{pasos_temp}\n"

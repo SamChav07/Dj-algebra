@@ -1,79 +1,67 @@
 document.addEventListener('DOMContentLoaded', function () {
-    const createMatrixInputs = document.getElementById('createMatrixInputs');
+    const createMatrixInputsBtn = document.getElementById('createMatrixInputs');
     const matrixInputsContainer = document.getElementById('matrixInputsContainer');
     const resolveBtn = document.getElementById('resolveBtn');
     const resolverForm = document.getElementById('resolverForm');
 
-    // Event listener for creating the matrix inputs
-    createMatrixInputs.addEventListener('click', function () {
+    // Evento para crear las entradas de la matriz
+    createMatrixInputsBtn.addEventListener('click', function () {
         const tamMtrx = parseInt(document.getElementById('id_tamMtrx').value);
-        
-        // Validate input
+
         if (isNaN(tamMtrx) || tamMtrx <= 0) {
             alert('Por favor, ingresa un tamaño válido para la matriz (mayor que 0).');
             return;
         }
 
-        // Clear previous matrix inputs
+        // Limpiar el contenedor previo
         matrixInputsContainer.innerHTML = '';
 
-        // Create and display the inputs for the matrix and independent terms
-        crearEntradasMatriz(tamMtrx);
+        // Crear las entradas de la matriz
+        crearInputsDeMatriz(tamMtrx);
 
-        // Show the "Resolve" button
+        // Mostrar el botón de "Guardar y Resolver"
         resolveBtn.style.display = 'block';
     });
 
-    // Event listener for form submission
+    // Enviar datos al backend
     resolverForm.addEventListener('submit', async function (event) {
-        event.preventDefault(); // Prevent traditional form submission
+        event.preventDefault();
 
         try {
-            // Convert matrix and independent terms inputs to JSON format
             const matriz = obtenerMatriz();
-            const termsIndp = obtenerTerminosIndependientes();
 
-            // Log the matrix and terms being sent for debugging
-            console.log('Matriz:', matriz);
-            console.log('Términos Independientes:', termsIndp);
-
-            // Prepare data to send
-            const datosAEnviar = {
-                cramer_Matrx: matriz,  // Send the matrix as a list of lists
-                cramer_TermsIndp: termsIndp // Send the independent terms as a list
-            };
-
-            // Check if the matrix is valid
-            if (matriz.length === 0 || termsIndp.length === 0) {
-                alert('La matriz o los términos independientes no son válidos.');
-                return; // Exit the function if the matrix or terms are invalid
+            if (matriz.length === 0) {
+                alert('La matriz está vacía o no es válida.');
+                return;
             }
 
-            const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value; // Get CSRF token
+            const datosAEnviar = {
+                cramer_Matrx: JSON.stringify(matriz)
+            };
 
-            // Send data to the server using Fetch API
+            console.log('Datos a Enviar:', datosAEnviar);
+
+            const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+
             const response = await fetch(resolverForm.action, {
                 method: 'POST',
-                body: JSON.stringify(datosAEnviar), // Send the data as JSON string
+                body: new URLSearchParams(datosAEnviar),
                 headers: {
-                    'Content-Type': 'application/json', // Ensure content type is JSON
                     'X-Requested-With': 'XMLHttpRequest',
                     'X-CSRFToken': csrftoken
                 }
             });
 
-            const data = await response.json(); // Parse JSON response
+            const data = await response.json();
 
-            // Handle server response
             if (data.status === 'success') {
-                alert('Cálculo realizado exitosamente');
-                document.getElementById('resultText').textContent = JSON.stringify(data.resultados, null, 2); // Display results
+                mostrarResultados(data.resultados);
             } else {
                 let errorMessage = data.message;
                 if (data.errors) {
                     errorMessage += '\nErrores específicos:\n' + data.errors.join('\n');
                 }
-                alert(errorMessage); // Show detailed error message
+                alert(errorMessage);
             }
         } catch (error) {
             console.error('Error:', error);
@@ -81,29 +69,26 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     });
 
-    // Function to create inputs for the matrix and independent terms
-    function crearEntradasMatriz(tamMtrx) {
+    // Función para crear inputs para la matriz
+    function crearInputsDeMatriz(tamMtrx) {
         const table = document.createElement('table');
         table.className = 'table table-bordered';
 
-        // Create matrix rows and columns
         for (let i = 0; i < tamMtrx; i++) {
             const row = document.createElement('tr');
 
-            for (let j = 0; j < tamMtrx + 1; j++) { // Matrix columns + 1 for the results column
+            for (let j = 0; j < tamMtrx + 1; j++) {
                 const cell = document.createElement('td');
                 const input = document.createElement('input');
-
                 input.type = 'number';
                 input.className = 'form-control';
+
                 if (j < tamMtrx) {
-                    // For matrix values (first n columns)
                     input.placeholder = `(${i + 1}, ${j + 1})`;
                     input.name = `valor_${i + 1}_${j + 1}`;
                 } else {
-                    // For result values (last column)
-                    input.placeholder = `Resultado ${i + 1}`;
-                    input.name = `result_${i + 1}`;
+                    input.placeholder = `b${i + 1}`;
+                    input.name = `b_${i + 1}`;
                 }
 
                 cell.appendChild(input);
@@ -116,43 +101,61 @@ document.addEventListener('DOMContentLoaded', function () {
         matrixInputsContainer.appendChild(table);
     }
 
-    // Function to obtain the matrix as a two-dimensional array
+    // Obtener datos de la matriz desde los inputs
     function obtenerMatriz() {
         const tamMtrx = parseInt(document.getElementById('id_tamMtrx').value);
         const matriz = [];
 
         for (let i = 0; i < tamMtrx; i++) {
             const fila = [];
-            for (let j = 0; j < tamMtrx; j++) { // Only matrix coefficients (not the independent terms)
+            for (let j = 0; j < tamMtrx; j++) {
                 const input = document.querySelector(`input[name='valor_${i + 1}_${j + 1}']`);
                 const valor = parseFloat(input.value);
+
                 if (isNaN(valor)) {
                     alert(`El valor en la posición (${i + 1}, ${j + 1}) no es un número válido.`);
-                    return []; // Return an empty array to indicate error
+                    return [];
                 }
+
                 fila.push(valor);
             }
+
+            const inputB = document.querySelector(`input[name='b_${i + 1}']`);
+            const valorB = parseFloat(inputB.value);
+
+            if (isNaN(valorB)) {
+                alert(`El valor del término independiente b${i + 1} no es válido.`);
+                return [];
+            }
+
+            fila.push(valorB);
             matriz.push(fila);
         }
-
         return matriz;
     }
 
-    // Function to obtain the independent terms as an array
-    function obtenerTerminosIndependientes() {
-        const tamMtrx = parseInt(document.getElementById('id_tamMtrx').value);
-        const termsIndp = [];
+    function mostrarResultados(resultados) {
+        mostrarSolucion(resultados.solucion);
+        mostrarPasosDetallados(resultados.pasos_detallados);
+    }
 
-        for (let i = 0; i < tamMtrx; i++) {
-            const input = document.querySelector(`input[name='result_${i + 1}']`);
-            const valor = parseFloat(input.value);
-            if (isNaN(valor)) {
-                alert(`El valor del resultado en la posición ${i + 1} no es un número válido.`);
-                return []; // Return an empty array to indicate error
-            }
-            termsIndp.push(valor);
-        }
+    function mostrarSolucion(solucion) {
+        document.getElementById('resultTextSolucion').innerHTML = `<h4>Solución:</h4>${formatearVector(solucion)}`;
+        activateTab('tabSolucion');
+    }
 
-        return termsIndp;
+    function mostrarPasosDetallados(pasos_detallados) {
+        document.getElementById('resultTextPasosF').innerHTML = `<h4>Pasos de Factorización:</h4><pre>${pasos_detallados}</pre>`;
+        activateTab('tabPasosF');
+    }
+
+    // Función para activar una pestaña específica
+    function activateTab(tabId) {
+        const tabElement = new bootstrap.Tab(document.querySelector(`a[href="#${tabId}"]`));
+        tabElement.show();
+    }
+
+    function formatearVector(vector) {
+        return `<ul>${vector.map(valor => `<li>${valor.toFixed(2)}</li>`).join('')}</ul>`;
     }
 });

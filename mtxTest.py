@@ -1,133 +1,59 @@
-# eliminacionGauss/logic/matriz.py
+@require_POST
+def RglCramer_process(request):
+    logger.debug(f"Request POST data: {request.POST}")
 
-from eliminacionGauss.models import Elim_Gauss
+    form = RglCramerForm(request.POST)
 
-class Matriz:
-    """
-    Clase que representa una matriz y permite realizar eliminación Gaussiana.
-    """
+    # Obtener los datos de la matriz desde el POST
+    matriz_datos = request.POST.get('cramer_Matrx')
+    if not matriz_datos:
+        logger.error("cramer_Matrx not provided")
+        return JsonResponse({'status': 'error', 'message': 'cramer_Matrx no proporcionado.'}, status=400)
 
-    def __init__(self, matriz):
-        # Validar si la matriz es None
-        if matriz is None:
-            raise ValueError("La matriz no puede ser None.")
+    if form.is_valid():
+        try:
+            # Cargar los datos JSON de la matriz
+            matriz_json = json.loads(matriz_datos)
+            # Verificar que la matriz sea una lista de listas
+            if not isinstance(matriz_json, list) or not all(isinstance(row, list) for row in matriz_json):
+                raise ValueError("La matriz debe ser una lista de listas.")
 
-        # Validar si la matriz es una lista de listas
-        if isinstance(matriz, list) and all(isinstance(i, list) for i in matriz):
-            self.matriz = matriz
-        
-        # Validar si la matriz tiene el formato del método Cramer
-        elif isinstance(matriz, dict) and 'cramer_Matrx' in matriz and 'cramer_TermsIndp' in matriz:
-            # Extraer la matriz y los términos independientes del diccionario
-            matriz_base = matriz['cramer_Matrx']
-            terminos_independientes = matriz['cramer_TermsIndp']
+            # Separar matriz A y vector b
+            matriz_a = [row[:-1] for row in matriz_json]  # Todos los elementos excepto el último de cada fila
+            resultado = [row[-1] for row in matriz_json]   # Último elemento de cada fila
 
-            # Validar dimensiones
-            if len(matriz_base) != len(terminos_independientes):
-                raise ValueError("La cantidad de filas en la matriz debe coincidir con la cantidad de términos independientes.")
+            # Verificar dimensiones
+            if not all(len(row) == len(matriz_a) + 1 for row in matriz_json):
+                    raise ValueError("Las dimensiones de la matriz no son válidas. Asegúrate de que sea n x (n+1).")
 
-            # Construir la matriz ampliada
-            self.matriz = [fila + [terminos_independientes[i]] for i, fila in enumerate(matriz_base)]
-        
-        else:
-            raise ValueError("Formato de matriz no reconocido. Debe ser una lista de listas o un diccionario con 'cramer_Matrx' y 'cramer_TermsIndp'.")
+            # Crear objeto Matriz y resolver con la regla de Cramer
+            matriz = Matriz(matriz_a)
+            soluciones, pasos_detallados = matriz.cramer(resultado ,paso_a_paso=True)
 
-    def obtener_matriz(self, entradas):
-        """
-        Convierte las entradas en formato de lista de listas a una matriz de números flotantes.
-        :param entradas: lista de listas con los coeficientes de las ecuaciones.
-        :return: matriz convertida a tipo flotante.
-        :raises ValueError: Si alguna entrada no puede ser convertida.
-        """
-        if self.matriz is None:
-            raise ValueError("La matriz no puede ser None.")
-        return self.matriz
+            logger.info("Cramer operation completed successfully.")
 
-        def factorizacion_lu(self, paso_a_paso=False):
-        """
-        Realiza la factorización LU de la matriz A (sin pivoteo) mostrando los pasos de manera visual y detallada.
-        :param paso_a_paso: si es True, muestra los pasos de la factorización.
-        :return: tupla con matrices L y U, y los pasos si paso_a_paso es True.
-        """
-        n = len(self.matriz)
-        L = [[0.0] * n for _ in range(n)]  # Inicializar L como matriz de ceros
-        U = [fila[:] for fila in self.matriz]  # Inicializar U como copia de A
-        pasos = "" if paso_a_paso else None
+            resultados = {
+                'solucion': soluciones,
+                'pasos_detallados': pasos_detallados,
+            }
+            
+            return JsonResponse({'status': 'success', 'resultados': {'resultados': resultados}})
 
-        # Función local para formatear matrices en formato de tabla visual
-        def formatear_matriz_visual(matriz, nombre_matriz):
-            """Formatea una matriz en un string visualmente claro."""
-            texto = f"{nombre_matriz} =\n"
-            for fila in matriz:
-                texto += "| " + "  ".join(f"{valor:.2f}" for valor in fila) + " |\n"
-            return texto
+        except json.JSONDecodeError:
+            logger.error("cramer_Matrx no es un JSON válido.")
+            return JsonResponse({'status': 'error', 'message': 'cramer_Matrx no es un JSON válido.'}, status=400)
+        except ValueError as e:
+            logger.error(f"Error processing matrix data: {str(e)}")
+            return JsonResponse({'status': 'error', 'message': str(e)}, status=400)
+        except Exception as e:
+            logger.error(f"Error Inesperado: {str(e)}")
+            return JsonResponse({'status': 'error', 'message': f"Error inesperado: {str(e)}"}, status=500)
 
-        if paso_a_paso:
-            pasos += "---- Inicio de la Factorización LU ----\n"
-            pasos += formatear_matriz_visual(self.matriz, "A (Matriz original)") + "\n"
+    # Manejo de errores de formulario
+    errors = []
+    for field, error_list in form.errors.items():
+        for error in error_list:
+            errors.append(f"{field}: {error}")
 
-        for i in range(n):
-            L[i][i] = 1.0  # La diagonal de L es 1
-
-            for j in range(i + 1, n):
-                if abs(U[i][i]) < 1e-10:
-                    raise ValueError("La factorización LU requiere que los elementos diagonales no sean cero.")
-
-                # Calcular el factor que multiplicará la fila de U
-                factor = U[j][i] / U[i][i]
-                L[j][i] = factor
-
-                if paso_a_paso:
-                    pasos += f"Paso {i + 1}.{j + 1}: Calculamos el factor L[{j + 1}][{i + 1}] = {factor:.2f}\n"
-
-                # Actualizar la fila de U restando el múltiplo correspondiente de la fila pivote
-                for k in range(i, n):
-                    U[j][k] -= factor * U[i][k]
-
-                if paso_a_paso:
-                    pasos += "\nActualizando L y U:\n"
-                    pasos += formatear_matriz_visual(L, "L") + "\n"
-                    pasos += formatear_matriz_visual(U, "U") + "\n"
-                    pasos += "-" * 30 + "\n"  # Separador visual
-
-        return (Matriz(n, L), Matriz(n, U), pasos) if paso_a_paso else (Matriz(n, L), Matriz(n, U))
-    
-    def resolver_lu(self, b, paso_a_paso=False):
-        """
-        Resuelve el sistema Ax = b utilizando la factorización LU, mostrando los pasos de manera visual.
-        :param b: vector de términos independientes.
-        :param paso_a_paso: si es True, muestra los pasos de la resolución.
-        :return: solución del sistema.
-        """
-        n = len(self.matriz)
-        L, U, pasos_lu = self.factorizacion_lu(paso_a_paso=True)  # Factorización LU
-
-        # Resolver Ly = b usando sustitución hacia adelante
-        y = [0.0] * n
-        if paso_a_paso:
-            pasos_lu += "\n---- Resolviendo Ly = b ----\n"
-
-        for i in range(n):
-            suma = sum(L.matriz[i][j] * y[j] for j in range(i))
-            y[i] = (b[i] - suma) / L.matriz[i][i]
-
-            # Descripción visual de cada paso
-            if paso_a_paso:
-                pasos_lu += f"y[{i + 1}] = (b[{i + 1}] - sum(L[{i + 1}][1..{i}]*y[1..{i}])) / L[{i + 1}][{i + 1}]\n"
-                pasos_lu += f"y[{i + 1}] = ({b[i]:.2f} - {suma:.2f}) / {L.matriz[i][i]:.2f} = {y[i]:.2f}\n"
-
-        # Resolver Ux = y usando sustitución hacia atrás
-        x = [0.0] * n
-        if paso_a_paso:
-            pasos_lu += "\n---- Resolviendo Ux = y ----\n"
-
-        for i in range(n - 1, -1, -1):
-            suma = sum(U.matriz[i][j] * x[j] for j in range(i + 1, n))
-            x[i] = (y[i] - suma) / U.matriz[i][i]
-
-            # Descripción visual de cada paso
-            if paso_a_paso:
-                pasos_lu += f"x[{i + 1}] = (y[{i + 1}] - sum(U[{i + 1}][{i + 2}..{n}]*x[{i + 2}..{n}])) / U[{i + 1}][{i + 1}]\n"
-                pasos_lu += f"x[{i + 1}] = ({y[i]:.2f} - {suma:.2f}) / {U.matriz[i][i]:.2f} = {x[i]:.2f}\n"
-
-        return (x, pasos_lu) if paso_a_paso else x
+    logger.warning("Form validation failed: %s", errors)
+    return JsonResponse({'status': 'error', 'message': 'Formulario no válido.', 'errors': errors}, status=400)

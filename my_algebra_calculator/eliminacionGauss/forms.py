@@ -126,14 +126,12 @@ class InvMtrxForm(forms.ModelForm):
 class RglCramerForm(forms.ModelForm):
     class Meta:
         model = RglCramer
-        fields = ['cramer_Matrx', 'cramer_TermsIndp']
+        fields = ['cramer_Matrx']
         widgets = {
             'cramer_Matrx': forms.Textarea(attrs={'rows': 10, 'cols': 40, 'placeholder': 'Ejemplo: [[1, 2], [3, 4]]'}),
-            'cramer_TermsIndp': forms.Textarea(attrs={'rows': 10, 'cols': 40, 'placeholder': 'Ejemplo: [1, 2]'}),
         }
         labels = {
             'cramer_Matrx': 'Matriz (en formato JSON)',
-            'cramer_TermsIndp': 'Terminos Independientes (en formato JSON)',
         }
 
 class factLUForm(forms.ModelForm):

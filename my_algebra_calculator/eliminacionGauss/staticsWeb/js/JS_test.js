@@ -30,7 +30,7 @@ document.addEventListener('DOMContentLoaded', function () {
         try {
             const matriz = obtenerMatriz();
 
-            if (matriz.length === 0 ) {
+            if (matriz.length === 0) {
                 alert('La matriz está vacía o no es válida.');
                 return;
             }
@@ -55,8 +55,7 @@ document.addEventListener('DOMContentLoaded', function () {
             const data = await response.json();
 
             if (data.status === 'success') {
-                alert('Datos procesados exitosamente');
-                document.getElementById('resultText').textContent = data.resultados;
+                mostrarResultados(data.resultados);
             } else {
                 let errorMessage = data.message;
                 if (data.errors) {
@@ -128,10 +127,71 @@ document.addEventListener('DOMContentLoaded', function () {
                 alert(`El valor del término independiente b${i + 1} no es válido.`);
                 return [];
             }
-            
+
             fila.push(valorB);
             matriz.push(fila);
         }
         return matriz;
+    }
+
+    // Función para mostrar los resultados en la página
+    function mostrarResultados(resultados) {
+        // Mostrar los resultados directamente en las pestañas
+        mostrarMatrizL(resultados.L);
+        mostrarMatrizU(resultados.U);
+        mostrarSolucion(resultados.solucion);
+        mostrarPasosFactorizacion(resultados.pasos_factorizacion);
+        mostrarPasosResolucion(resultados.pasos_resolucion);
+    }
+
+    // Funciones para mostrar cada resultado en las pestañas correspondientes
+    function mostrarMatrizL(matrizL) {
+        document.getElementById('resultTextL').innerHTML = `<h4>Matriz L:</h4>${formatearMatriz(matrizL)}`;
+        activateTab('tabL');
+    }
+
+    function mostrarMatrizU(matrizU) {
+        document.getElementById('resultTextU').innerHTML = `<h4>Matriz U:</h4>${formatearMatriz(matrizU)}`;
+        activateTab('tabU');
+    }
+
+    function mostrarSolucion(solucion) {
+        document.getElementById('resultTextSolucion').innerHTML = `<h4>Solución:</h4>${formatearVector(solucion)}`;
+        activateTab('tabSolucion');
+    }
+
+    function mostrarPasosFactorizacion(pasos) {
+        document.getElementById('resultTextPasosF').innerHTML = `<h4>Pasos de Factorización:</h4><pre>${pasos}</pre>`;
+        activateTab('tabPasosF');
+    }
+
+    function mostrarPasosResolucion(pasos) {
+        document.getElementById('resultTextPasosR').innerHTML = `<h4>Pasos de Resolución:</h4><pre>${pasos}</pre>`;
+        activateTab('tabPasosR');
+    }
+
+    // Función para activar una pestaña específica
+    function activateTab(tabId) {
+        const tabElement = new bootstrap.Tab(document.querySelector(`a[href="#${tabId}"]`));
+        tabElement.show();
+    }
+
+    // Función para formatear una matriz como tabla
+    function formatearMatriz(matriz) {
+        let html = '<table class="table table-bordered">';
+        matriz.forEach(fila => {
+            html += '<tr>';
+            fila.forEach(valor => {
+                html += `<td>${valor.toFixed(2)}</td>`;
+            });
+            html += '</tr>';
+        });
+        html += '</table>';
+        return html;
+    }
+
+    // Función para formatear un vector como lista
+    function formatearVector(vector) {
+        return `<ul>${vector.map(valor => `<li>${valor.toFixed(2)}</li>`).join('')}</ul>`;
     }
 });

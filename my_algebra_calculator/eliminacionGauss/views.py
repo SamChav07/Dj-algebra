@@ -550,66 +550,63 @@ def get_existing_ids_RglCramer(request):
 
 @require_POST
 def RglCramer_process(request):
-    try:
-        # Parse JSON body
-        body_unicode = request.body.decode('utf-8')
-        body_data = json.loads(body_unicode)
+    logger.debug(f"Request POST data: {request.POST}")
 
-        # Retrieve the matrix and results
-        matriz_datos = body_data.get('cramer_Matrx')
-        resultados = body_data.get('cramer_TermsIndp')
+    form = RglCramerForm(request.POST)
 
-        # Validar que la matriz haya sido proporcionada
-        if not matriz_datos:
-            logger.error("cramer_Matrx no proporcionado.")
-            return JsonResponse({'status': 'error', 'message': 'La matriz no fue proporcionada.'}, status=400)
+    # Obtener los datos de la matriz desde el POST
+    matriz_datos = request.POST.get('cramer_Matrx')
+    if not matriz_datos:
+        logger.error("cramer_Matrx not provided")
+        return JsonResponse({'status': 'error', 'message': 'cramer_Matrx no proporcionado.'}, status=400)
 
-        # Validar que la matriz sea una lista de listas
-        if not isinstance(matriz_datos, list) or not all(isinstance(i, list) for i in matriz_datos):
-            logger.error("cramer_Matrx no es una lista de listas válida.")
-            return JsonResponse({'status': 'error', 'message': 'La matriz debe ser una lista de listas.'}, status=400)
-
-        # Validar los términos independientes
-        if not isinstance(resultados, list) or len(resultados) != len(matriz_datos):
-            logger.error("El número de términos independientes no coincide con el número de ecuaciones.")
-            return JsonResponse({'status': 'error', 'message': 'El número de términos independientes debe coincidir con el número de ecuaciones.'}, status=400)
-
-        # Log the received matrix (without exposing sensitive information)
-        logger.info(f"Matrix received: {matriz_datos} with {len(resultados)} independent terms.")
-
-        # Create the matrix object
-        matriz = Matriz(matriz_datos)
-
-        # Perform the Cramer's rule calculation
+    if form.is_valid():
         try:
-            resultado = matriz.cramer(resultados)
+            # Cargar los datos JSON de la matriz
+            matriz_json = json.loads(matriz_datos)
+            # Verificar que la matriz sea una lista de listas
+            if not isinstance(matriz_json, list) or not all(isinstance(row, list) for row in matriz_json):
+                raise ValueError("La matriz debe ser una lista de listas.")
+
+            # Separar matriz A y vector b
+            matriz_a = [row[:-1] for row in matriz_json]  # Todos los elementos excepto el último de cada fila
+            resultado = [row[-1] for row in matriz_json]   # Último elemento de cada fila
+
+            # Verificar dimensiones
+            if not all(len(row) == len(matriz_a) + 1 for row in matriz_json):
+                    raise ValueError("Las dimensiones de la matriz no son válidas. Asegúrate de que sea n x (n+1).")
+
+            # Crear objeto Matriz y resolver con la regla de Cramer
+            matriz = Matriz(matriz_a)
+            soluciones, pasos_detallados = matriz.cramer(resultado ,paso_a_paso=True)
+
+            logger.info("Cramer operation completed successfully.")
+
+            resultados = {
+                'solucion': soluciones,
+                'pasos_detallados': pasos_detallados,
+            }
+            
+            return JsonResponse({'status': 'success', 'resultados': resultados})
+
+        except json.JSONDecodeError:
+            logger.error("cramer_Matrx no es un JSON válido.")
+            return JsonResponse({'status': 'error', 'message': 'cramer_Matrx no es un JSON válido.'}, status=400)
+        except ValueError as e:
+            logger.error(f"Error processing matrix data: {str(e)}")
+            return JsonResponse({'status': 'error', 'message': str(e)}, status=400)
         except Exception as e:
-            logger.error(f"Error calculating with Cramer's rule: {str(e)}")
-            return JsonResponse({'status': 'error', 'message': 'Error calculando la solución usando la regla de Cramer.'}, status=500)
+            logger.error(f"Error Inesperado: {str(e)}")
+            return JsonResponse({'status': 'error', 'message': f"Error inesperado: {str(e)}"}, status=500)
 
-        # Save the result to the model
-        instancia = RglCramer.objects.create(
-            cramer_Matrx=matriz_datos,
-            cramer_TermsIndp=resultados,  # Save the independent terms as well
-            cramer_resultado=resultado,
-            cramer_ecuaciones="Cálculo realizado con la regla de Cramer"
-        )
+    # Manejo de errores de formulario
+    errors = []
+    for field, error_list in form.errors.items():
+        for error in error_list:
+            errors.append(f"{field}: {error}")
 
-        # Return the success response
-        logger.info("Cálculo realizado exitosamente.")
-        return JsonResponse({'status': 'success', 'resultados': resultado}, status=200)
-
-    except json.JSONDecodeError:
-        logger.error("El cuerpo de la solicitud no es un JSON válido.")
-        return JsonResponse({'status': 'error', 'message': 'El cuerpo de la solicitud debe ser un JSON válido.'}, status=400)
-
-    except KeyError as e:
-        logger.error(f"Falta un campo requerido: {str(e)}")
-        return JsonResponse({'status': 'error', 'message': f'Falta el campo requerido: {str(e)}'}, status=400)
-
-    except Exception as e:
-        logger.exception("Ocurrió un error procesando la solicitud.")
-        return JsonResponse({'status': 'error', 'message': 'Ocurrió un error inesperado. Por favor, intente nuevamente.'}, status=500)
+    logger.warning("Form validation failed: %s", errors)
+    return JsonResponse({'status': 'error', 'message': 'Formulario no válido.', 'errors': errors}, status=400)
 
 def factLU_view(request):
     """Renderiza la página con el formulario de factorización LU."""
@@ -630,7 +627,7 @@ def factLU_process(request):
 
     matriz_datos = request.POST.get('lu_mtrx')
     if not matriz_datos:
-        logger.error("Matrix not provided")
+        logger.error("lu_mtrx not provided")
         return JsonResponse({'status': 'error', 'message': 'lu_mtrx no proporcionado.'}, status=400)
 
     if form.is_valid():

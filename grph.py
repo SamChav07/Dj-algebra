@@ -1,44 +1,39 @@
-import numpy as np
-import matplotlib.pyplot as plt
-from mpl_toolkits.mplot3d import Axes3D
+@require_POST
+def RglCramer_process(request):
+    logger.debug(f"Request POST data: {request.POST}")
 
-# Definimos la matriz A y el vector B
-A = np.array([[2, 3, 1],
-              [4, 1, 2],
-              [3, 2, 3]])
+    # Obtener los datos de la matriz desde el POST
+    matriz_datos = request.POST.get('cramer_Matrx')
 
-B = np.array([1, 2, 3])
+    if not matriz_datos:
+        logger.error("cramer_Matrx not provided")
+        return JsonResponse({'status': 'error', 'message': 'cramer_Matrx no proporcionado.'}, status=400)
 
-# Resolviendo el sistema de ecuaciones AX = B usando eliminación gaussiana
-X = np.linalg.solve(A, B)
+    try:
+        # Cargar los datos JSON de la matriz
+        matriz_json = json.loads(matriz_datos)
 
-# Imprimimos los resultados
-print("Solución del sistema:")
-print(f"x = {X[0]}, y = {X[1]}, z = {X[2]}")
+        # Verificar que la matriz sea una lista de listas
+        if not isinstance(matriz_json, list) or not all(isinstance(row, list) for row in matriz_json):
+            raise ValueError("La matriz debe ser una lista de listas.")
 
-# Visualización en 3D
-fig = plt.figure()
-ax = fig.add_subplot(111, projection='3d')
+        if not matriz_json:
+            raise ValueError("No se proporcionaron matrices.")
 
-# Creamos una cuadrícula para graficar las soluciones
-x_vals = np.linspace(-1, 1, 10)
-y_vals = np.linspace(-1, 1, 10)
-x_grid, y_grid = np.meshgrid(x_vals, y_vals)
+        matriz = Matriz(matriz_json)
 
-# Calculamos z para cada par (x,y) usando la primera ecuación como ejemplo
-z_grid = (1 - 2*x_grid - 3*y_grid)
+        soluciones, pasos_detallados = matriz.cramer(paso_a_paso=True)
 
-# Graficamos la superficie resultante
-ax.plot_surface(x_grid, y_grid, z_grid, alpha=0.5, rstride=100, cstride=100)
+        cramer_instance = RglCramer.objects.create(
+            cramer_Matrx = matriz_json,
+            cramer_resultado = soluciones,
+            cramer_ecuaciones = pasos_detallados
+        )
 
-# Añadimos puntos de solución
-ax.scatter(X[0], X[1], X[2], color='r', s=100) # Punto de solución
+        logger.info("Cramer operation completed successfully.")
+        
+        return JsonResponse({'status': 'success', 'resultados': {'resultados': resultados}})
 
-# Etiquetas de los ejes
-ax.set_xlabel('X')
-ax.set_ylabel('Y')
-ax.set_zlabel('Z')
-plt.title('Visualización de la Solución del Sistema de Ecuaciones')
-
-# Mostramos el gráfico
-plt.show()
+    except (ValueError, json.JSONDecodeError) as e:
+        logger.error(f"Error al procesar los datos JSON: {str(e)}")
+        return JsonResponse({'status': 'error', 'message': str(e)}, status=400)
