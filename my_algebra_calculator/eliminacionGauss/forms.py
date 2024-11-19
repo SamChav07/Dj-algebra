@@ -150,7 +150,7 @@ class factLUForm(forms.ModelForm):
 class biSeccionForm(forms.ModelForm):
     class Meta:
         model = biSeccion
-        fields = ['bi_funcion']
+        fields = ['bi_funcion'] 
         widgets = {
             'bi_funcion': forms.Textarea(attrs={'rows': 10, 'cols': 40, 'placeholder': 'Ejemplo: x^2 - 4'}),        
         }
