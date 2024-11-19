@@ -4,12 +4,13 @@ import logging
 import json
 from django.shortcuts import render
 from django.http import JsonResponse
-from .models import Elim_Gauss, Ope_combinadas, MultiFxC, PropMxV, SmMrx, TrnsMtx, multMtrX, ClcDeterm, InvMtrx, RglCramer, factLU
-from .forms import ElimGaussForm, CombVectorForm, MultiFxCForm, PropMxVForm, SmMrxForm, TrnsMtxForm, MultMtrXForm, ClcDetermForm, InvMtrxForm, RglCramerForm, factLUForm
+from .models import Elim_Gauss, Ope_combinadas, MultiFxC, PropMxV, SmMrx, TrnsMtx, multMtrX, ClcDeterm, InvMtrx, RglCramer, factLU, biSeccion
+from .forms import ElimGaussForm, CombVectorForm, MultiFxCForm, PropMxVForm, SmMrxForm, TrnsMtxForm, MultMtrXForm, ClcDetermForm, InvMtrxForm, RglCramerForm, factLUForm, biSeccionForm
 from django.views.decorators.http import require_POST
 from .logic.matriz import Matriz
 from .logic.vector import Vector
 from .logic.matrizxvector import MxV
+from .logic.analisis_num import AnNumerico
 
 # Configure logging
 logger = logging.getLogger(__name__)
@@ -667,6 +668,65 @@ def factLU_process(request):
             return JsonResponse({'status': 'error', 'message': 'lu_mtrx no es un JSON válido.'}, status=400)
         except ValueError as e:
             logger.error(f"Error processing matrix data: {str(e)}")
+            return JsonResponse({'status': 'error', 'message': str(e)}, status=400)
+        except Exception as e:
+            logger.error(f"Unexpected error: {str(e)}")
+            return JsonResponse({'status': 'error', 'message': f"Error inesperado: {str(e)}"}, status=500)
+
+    # Manejo de errores de formulario
+    errors = []
+    for field, error_list in form.errors.items():
+        for error in error_list:
+            errors.append(f"{field}: {error}")
+
+    logger.warning("Form validation failed: %s", errors)
+    return JsonResponse({'status': 'error', 'message': 'Formulario no válido.', 'errors': errors}, status=400)
+
+def bi_view(request):
+    form = biSeccionForm()
+    return render(request, 'analisisNm/biseccion.html',  {'form': form})
+
+def get_existing_ids_bi(request):
+    ids = list(biSeccion.objects.values_list('id', flat=True))
+    return JsonResponse({'ids': ids})
+
+@require_POST
+def biSeccion_process(request):
+    logger.debug(f"Request POST data: {request.POST}")
+
+    # Obtén los datos de la función desde el formulario
+    Lfunction_datos = request.POST.get('bi_funcion')
+    
+    # Validación para asegurar que se haya proporcionado la función
+    if not Lfunction_datos:
+        logger.error("bi_funcion not provided")
+        return JsonResponse({'status': 'error', 'message': 'bi_funcion no proporcionado.'}, status=400)
+
+    # Procesar el formulario
+    form = biSeccionForm(request.POST)
+    if form.is_valid():
+        try:
+            # En este caso, Lfunction_datos es un texto y se pasa directamente
+            # Asegúrate de que Lfunction_datos sea un string válido (si es necesario)
+            if not isinstance(Lfunction_datos, str):
+                raise ValueError("La función debe ser un texto.")
+
+            # Creando la instancia de AnNumerico con el texto de la función
+            function = AnNumerico(Lfunction_datos)
+
+            # Llamando al método de bisección de la clase
+            calc_Raiz = function.run_bisection()
+
+            logger.info("Bisection operation completed successfully.")
+
+            # Devolver el resultado
+            resultado = {
+                'calc_Raiz': calc_Raiz,
+            }
+            return JsonResponse({'status': 'success', 'resultado': resultado})
+
+        except ValueError as e:
+            logger.error(f"Error en la función: {str(e)}")
             return JsonResponse({'status': 'error', 'message': str(e)}, status=400)
         except Exception as e:
             logger.error(f"Unexpected error: {str(e)}")

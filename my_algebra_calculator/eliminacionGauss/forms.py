@@ -134,6 +134,7 @@ class RglCramerForm(forms.ModelForm):
             'cramer_Matrx': 'Matriz (en formato JSON)',
         }
 
+#Forms11
 class factLUForm(forms.ModelForm):
     class Meta:
         model = factLU
@@ -143,4 +144,16 @@ class factLUForm(forms.ModelForm):
         }
         labels = {
             'lu_mtrx': 'Matriz (en formato JSON)',
+        }
+
+#Forms12
+class biSeccionForm(forms.ModelForm):
+    class Meta:
+        model = biSeccion
+        fields = ['bi_funcion']
+        widgets = {
+            'bi_funcion': forms.Textarea(attrs={'rows': 10, 'cols': 40, 'placeholder': 'Ejemplo: x^2 - 4'}),        
+        }
+        labels = {
+            'bi_funcion': 'bi_funcion (en formato Text)',
         }

@@ -50,4 +50,9 @@ urlpatterns = [
     path('factLU/', factLU_view, name='factLU_view'),  # Vista para cargar el formulario de transposición
     path('get_existing_ids_factLU/', get_existing_ids_factLU, name='get_existing_ids_factLU'),  # Vista para obtener los IDs existentes
     path('factLU/process/', factLU_process, name='factLU_process'),  # Vista para procesar la transposición de la matriz
+    #Ánalisis Numerico
+    #12
+    path('bi/', bi_view, name='bi_view'),
+    path('get_existing_ids_bi/', get_existing_ids_bi, name='get_existing_ids_bi'),  # Vista para obtener los IDs existentes
+    path('biSeccion/process/', biSeccion_process, name='biSeccion_process'),  # Vista para procesar la transposición de la matriz
 ]
