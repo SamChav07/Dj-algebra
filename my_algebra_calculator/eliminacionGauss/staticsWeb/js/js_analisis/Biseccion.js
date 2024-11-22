@@ -1,4 +1,3 @@
-// Espera a que el DOM se cargue completamente
 document.addEventListener("DOMContentLoaded", function () {
     const functionInput = document.getElementById("id_functionInput");
     const renderedFunctionView = document.getElementById("renderedFunctionView");
