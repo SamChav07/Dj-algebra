@@ -7,12 +7,12 @@ document.addEventListener("DOMContentLoaded", function () {
 
     // Configuración de los botones matemáticos
     const buttonsConfig = [
-        ['+', '+'], ['-', '-'], ['×', '\\times '], ['÷', '\\div '],
-        ['xˣ', 'x^{'], ['√', '\\sqrt{'], ['ln', '\\ln('], ['log₁₀', '\\log_{10}('],
-        ['logₐ', '\\log_{'], ['sin', '\\sin('], ['cos', '\\cos('], ['tan', '\\tan('],
-        ['sinh', '\\sinh('], ['cosh', '\\cosh('], ['tanh', '\\tanh('], ['arcsin', '\\arcsin('],
-        ['arccos', '\\arccos('], ['arctan', '\\arctan('], ['cot', '\\cot('], ['sec', '\\sec('],
-        ['csc', '\\csc('], ['(', '('], [')', ')'], ['π', '\\pi '], ['e', 'e']
+        ['+', '+'], ['-', '-'], ['×', '*'], ['÷', '/'],
+        ['xˣ', '**'], ['√', 'sqrt('], ['ln', 'ln('], ['log₁₀', 'log10('],
+        ['logₐ', 'log('], ['sin', 'sin('], ['cos', 'cos('], ['tan', 'tan('],
+        ['sinh', 'sinh('], ['cosh', 'cosh('], ['tanh', 'tanh('], ['arcsin', 'asin('],
+        ['arccos', 'acos('], ['arctan', 'atan('], ['cot', 'cot('], ['sec', 'sec('],
+        ['csc', 'csc('], ['(', '('], [')', ')'], ['π', 'pi'], ['e', 'E']
     ];
 
     // Generar dinámicamente los botones del teclado
@@ -41,16 +41,11 @@ document.addEventListener("DOMContentLoaded", function () {
         const newValue =
             currentValue.slice(0, cursorPosition) +
             text +
-            (text.endsWith('{') ? '}' : '') +
             currentValue.slice(cursorPosition);
 
         functionInput.value = newValue;
 
-        if (text.endsWith('{')) {
-            functionInput.selectionStart = functionInput.selectionEnd = cursorPosition + text.length;
-        } else {
-            functionInput.selectionStart = functionInput.selectionEnd = cursorPosition + text.length;
-        }
+        functionInput.selectionStart = functionInput.selectionEnd = cursorPosition + text.length;
 
         // Dispara un evento de entrada para actualizar la vista renderizada
         functionInput.dispatchEvent(new Event("input"));
@@ -60,10 +55,10 @@ document.addEventListener("DOMContentLoaded", function () {
     functionInput.addEventListener("input", function () {
         const functionText = functionInput.value;
 
-        // Renderiza la función usando MathJax
+        // Renderiza la función usando MathJax para que sea legible para el usuario
         renderedFunctionView.innerHTML = `
             Aquí se renderizará la función ingresada: 
-            <div id="math-output" style="font-size: 28px; color: black; padding: 20px;">\\( ${functionText} \\)</div>
+            <div id="math-output" style="font-size: 28px; color: black; padding: 20px;">\\( ${functionText.replace(/\*\*/g, '^')} \\)</div>
         `;
 
         MathJax.typeset();
@@ -100,20 +95,11 @@ document.addEventListener("DOMContentLoaded", function () {
         return { bi_funcion };
     }
 
-    // Función para mostrar los resultados en la página
-    function mostrarResultados(resultados) {
-        // Aquí puedes implementar cómo mostrar los resultados devueltos por el servidor.
-        alert(`Resultado de la raíz: ${resultados.calc_Raiz}`); // Ejemplo simple
-
-        // Puedes agregar más lógica aquí para mostrar matrices o pasos.
-    }
-
     // Función para manejar el envío del formulario mediante AJAX
     bisectionForm.addEventListener('submit', async function (event) {
         event.preventDefault(); // Prevenir el envío normal del formulario
 
         const datosAEnviar = obtenerDatosFormulario();
-        
         if (!datosAEnviar) return; // Si hay un error en la obtención de datos, salir
 
         console.log('Datos a Enviar:', datosAEnviar);
@@ -134,7 +120,7 @@ document.addEventListener("DOMContentLoaded", function () {
             const data = await response.json();
 
             if (data.status === 'success') {
-                mostrarResultados(data.resultado); // Muestra resultados en la interfaz
+                mostrarResultados(data); // Muestra resultados en la interfaz
             } else {
                 let errorMessage = data.message;
                 if (data.errors) {
@@ -142,10 +128,37 @@ document.addEventListener("DOMContentLoaded", function () {
                 }
                 alert(errorMessage);
             }
-            
+
         } catch (error) {
             alert('Ocurrió un error al enviar los datos.');
             console.error(error);
         }
     });
+
+    // Función para manejar la respuesta del servidor
+    function mostrarResultados(data) {
+        if (data.status === 'success') {
+            const resultados = data.resultados;
+            mostrarSolucion(resultados.solucion);
+            mostrarIteraciones(resultados.iteraciones);
+        } else {
+            console.error("Error en la respuesta:", data.message);
+        }
+    }
+
+    function mostrarSolucion(solucion) {
+        document.getElementById('resultTextS').innerHTML = `<h4>Solución:</h4><p>${solucion}</p>`;
+        activateTab('tabS');
+    }
+
+    function mostrarIteraciones(iteraciones) {
+        document.getElementById('resultTextIter').innerHTML = `<h4>Iteraciones:</h4><ul>${iteraciones.map(paso => `<li>${paso}</li>`).join('')}</ul>`;
+        activateTab('tabI');
+    }
+
+    // Función para activar la pestaña correspondiente
+    function activateTab(tabId) {
+        const tab = document.querySelector(`a[href="#${tabId}"]`);
+        if (tab) tab.click();
+    }
 });

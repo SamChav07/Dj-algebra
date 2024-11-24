@@ -692,51 +692,114 @@ def get_existing_ids_bi(request):
 
 @require_POST
 def biSeccion_process(request):
-    logger.debug(f"Request POST data: {request.POST}")
+    logger.debug(f"Request POST data: {request.body.decode('utf-8')}")
 
-    # Obtén los datos de la función desde el formulario
-    Lfunction_datos = request.POST.get('bi_funcion')
-    
-    # Validación para asegurar que se haya proporcionado la función
-    if not Lfunction_datos:
-        logger.error("bi_funcion not provided")
-        return JsonResponse({'status': 'error', 'message': 'bi_funcion no proporcionado.'}, status=400)
+    try:
+        # Intentar cargar los datos como JSON
+        data = json.loads(request.body)
 
-    # Procesar el formulario
-    form = biSeccionForm(request.POST)
-    if form.is_valid():
-        try:
-            # En este caso, Lfunction_datos es un texto y se pasa directamente
-            # Asegúrate de que Lfunction_datos sea un string válido (si es necesario)
-            if not isinstance(Lfunction_datos, str):
-                raise ValueError("La función debe ser un texto.")
+        # Verificar que el JSON contiene las claves necesarias
+        bi_funcion_data = data.get("bi_funcion")
+        if not bi_funcion_data:
+            logger.error("El campo 'bi_funcion' no se encuentra en el cuerpo de la solicitud.")
+            return JsonResponse({'status': 'error', 'message': "El campo 'bi_funcion' es obligatorio."}, status=400)
 
-            # Creando la instancia de AnNumerico con el texto de la función
-            function = AnNumerico(Lfunction_datos)
+        # Validar que `bi_funcion` contiene `bi_funcion` y `bi_AB`
+        bi_funcion_json = json.loads(bi_funcion_data)  # Convertir el string JSON en diccionario
+        if "bi_funcion" not in bi_funcion_json or "bi_AB" not in bi_funcion_json:
+            logger.error("Faltan claves obligatorias en el JSON de 'bi_funcion'.")
+            return JsonResponse({'status': 'error', 'message': "El JSON debe contener 'bi_funcion' y 'bi_AB'."}, status=400)
 
-            # Llamando al método de bisección de la clase
-            calc_Raiz = function.run_bisection()
+        # Guardar el dato en el modelo
+        registro = biSeccion.objects.create(
+            bi_funcion=bi_funcion_json,
+            bi_resultado=None  # Inicialmente vacío
+        )
+        logger.info(f"Registro creado exitosamente con ID: {registro.id}")
 
-            logger.info("Bisection operation completed successfully.")
+        # Procesar los datos con AnNumerico
+        an_num = AnNumerico(bi_funcion_json)
+        resultado = an_num.run_bisection()
 
-            # Devolver el resultado
-            resultado = {
-                'calc_Raiz': calc_Raiz,
+        # Actualizar el resultado en el modelo
+        registro.bi_resultado = {"pasos": resultado['iteraciones'], "solucion": resultado['solucion']}
+        registro.save()
+        logger.info(f"Resultado almacenado para el registro ID: {registro.id}")
+
+        # Responder con los resultados separados
+        return JsonResponse({
+            'status': 'success',
+            'message': f"Registro procesado exitosamente con ID: {registro.id}",
+            'resultados': {
+                'solucion': resultado['solucion'],
+                'iteraciones': resultado['iteraciones']
             }
-            return JsonResponse({'status': 'success', 'resultado': resultado})
+        })
 
-        except ValueError as e:
-            logger.error(f"Error en la función: {str(e)}")
-            return JsonResponse({'status': 'error', 'message': str(e)}, status=400)
-        except Exception as e:
-            logger.error(f"Unexpected error: {str(e)}")
-            return JsonResponse({'status': 'error', 'message': f"Error inesperado: {str(e)}"}, status=500)
+    except json.JSONDecodeError:
+        logger.error("El cuerpo de la solicitud no contiene un JSON válido.")
+        return JsonResponse({'status': 'error', 'message': 'Formato JSON inválido en el cuerpo de la solicitud.'}, status=400)
+    except ValueError as e:
+        logger.error(f"Error en los datos de bi_funcion: {str(e)}")
+        return JsonResponse({'status': 'error', 'message': str(e)}, status=400)
+    except Exception as e:
+        logger.error(f"Error inesperado: {str(e)}")
+        return JsonResponse({'status': 'error', 'message': f"Error inesperado: {str(e)}"}, status=500)
 
-    # Manejo de errores de formulario
-    errors = []
-    for field, error_list in form.errors.items():
-        for error in error_list:
-            errors.append(f"{field}: {error}")
 
-    logger.warning("Form validation failed: %s", errors)
-    return JsonResponse({'status': 'error', 'message': 'Formulario no válido.', 'errors': errors}, status=400)
+
+
+
+
+"""@require_POST
+def biSeccion_process(request):
+    logger.debug(f"Request POST data: {request.body.decode('utf-8')}")
+
+    try:
+        # Intentar cargar los datos como JSON
+        data = json.loads(request.body)
+
+        # Verificar que el JSON contiene las claves necesarias
+        bi_funcion_data = data.get("bi_funcion")
+        if not bi_funcion_data:
+            logger.error("El campo 'bi_funcion' no se encuentra en el cuerpo de la solicitud.")
+            return JsonResponse({'status': 'error', 'message': "El campo 'bi_funcion' es obligatorio."}, status=400)
+
+        # Validar que `bi_funcion` contiene `bi_funcion` y `bi_AB`
+        bi_funcion_json = json.loads(bi_funcion_data)  # Convertir el string JSON en diccionario
+        if "bi_funcion" not in bi_funcion_json or "bi_AB" not in bi_funcion_json:
+            logger.error("Faltan claves obligatorias en el JSON de 'bi_funcion'.")
+            return JsonResponse({'status': 'error', 'message': "El JSON debe contener 'bi_funcion' y 'bi_AB'."}, status=400)
+
+        # Guardar el dato en el modelo
+        registro = biSeccion.objects.create(
+            bi_funcion=bi_funcion_json,
+            bi_resultado=None  # Inicialmente vacío
+        )
+        logger.info(f"Registro creado exitosamente con ID: {registro.id}")
+
+        # Procesar los datos con AnNumerico
+        an_num = AnNumerico(bi_funcion_json)
+        resultado = an_num.run_bisection()
+
+        # Actualizar el resultado en el modelo
+        registro.bi_resultado = {"pasos": resultado}
+        registro.save()
+        logger.info(f"Resultado almacenado para el registro ID: {registro.id}")
+
+        # Responder con el resultado del cálculo
+        return JsonResponse({
+            'status': 'success',
+            'message': f"Registro procesado exitosamente con ID: {registro.id}",
+            'resultados': resultado
+        })
+
+    except json.JSONDecodeError:
+        logger.error("El cuerpo de la solicitud no contiene un JSON válido.")
+        return JsonResponse({'status': 'error', 'message': 'Formato JSON inválido en el cuerpo de la solicitud.'}, status=400)
+    except ValueError as e:
+        logger.error(f"Error en los datos de bi_funcion: {str(e)}")
+        return JsonResponse({'status': 'error', 'message': str(e)}, status=400)
+    except Exception as e:
+        logger.error(f"Error inesperado: {str(e)}")
+        return JsonResponse({'status': 'error', 'message': f"Error inesperado: {str(e)}"}, status=500)"""

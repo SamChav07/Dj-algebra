@@ -106,18 +106,39 @@
             </div>
     
             <div class="col-md-6">
-                <!-- Área de resultados -->
                 <div class="result-container">
                     <h2 class="text-center">Resultados</h2>
-                    <div id="resultsView" class="mt-3">
-                        <p>Aquí se mostrarán los resultados.</p>
+                
+                    <!-- Botones para mostrar resultados -->
+                    <div id='resultText' style='margin-bottom: 20px;'></div>
+                
+                    <!-- Pestañas -->
+                    <ul class="nav nav-tabs justify-content-center mb-3" id="resultTabs">
+                        <li class="nav-item">
+                            <a class="nav-link active" data-bs-toggle="tab" href="#tabS">Solución</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" data-bs-toggle="tab" href="#tabI">Iteraciones</a>
+                        </li>
+                    </ul>
+                
+                    <!-- Contenido de las Pestañas -->
+                    <div class="tab-content mt-3">
+                        <div id="tabS" class="tab-pane fade show active">
+                            <!-- Aquí se mostrará la Solución -->
+                            <pre id='resultTextS'>Aquí aparecerá la solución.</pre>
+                        </div>
+                        <div id='tabI' class='tab-pane fade'>
+                            <!-- Aquí se mostrarán las Iteraciones -->
+                            <pre id='resultTextIter'>Aquí aparecerán las iteraciones.</pre>
+                        </div>
                     </div>
-    
+                
                     <!-- Botón para copiar LaTeX y abrir en Desmos -->
                     <div class="text-center mt-3">
                         <button class="btn btn-secondary" id="copyLatexButton">Copiar LaTeX y Abrir Desmos</button>
                     </div>
-                </div>
+                </div>                
             </div>
         </div>
     </main>

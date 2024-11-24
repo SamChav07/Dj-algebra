@@ -95,7 +95,7 @@ class factLU(models.Model):
         return f"self.factLU {self.id}"
 
 class biSeccion(models.Model):
-    bi_funcion = models.TextField()
+    bi_funcion = models.JSONField()
     bi_resultado = models.JSONField(null=True, blank=True) 
     def __str__(self):
         return f"self.biSeccion {self.id}"

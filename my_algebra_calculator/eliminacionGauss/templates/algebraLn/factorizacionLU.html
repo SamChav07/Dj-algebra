@@ -78,7 +78,7 @@
         
             <div class="col-md-6">
                 <div class="result-container">
-                    <h2>Resultados</h2>
+                    <h2 class="text-center">Resultados</h2>
 
                     <!-- Botones para mostrar resultados -->
                     <div id='resultText' style='margin-bottom: 20px;'></div>
@@ -86,13 +86,13 @@
                     <!-- Pestañas -->
                     <ul class="nav nav-tabs justify-content-center mb-3" id="resultTabs">
                         <li class="nav-item">
-                            <a class="nav-link active" data-bs-toggle="tab" href="#tabL">L</a>
+                            <a class="nav-link" data-bs-toggle="tab" href="#tabL">L</a>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link" data-bs-toggle="tab" href="#tabU">U</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" data-bs-toggle="tab" href="#tabSolucion">Solución</a>
+                            <a class="nav-link active" data-bs-toggle="tab" href="#tabSolucion">Solución</a>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link" data-bs-toggle="tab" href="#tabPasosF">PasosF</a>
@@ -104,7 +104,7 @@
 
                     <!-- Contenido de las Pestañas -->
                     <div class="tab-content mt-3">
-                        <div id="tabL" class="tab-pane fade show active">
+                        <div id="tabL" class="tab-pane fade">
                             <!-- Aquí se mostrará la matriz L -->
                             <pre id='resultTextL'>Aquí aparecerán los resultados de L.</pre>
                         </div>
@@ -112,7 +112,7 @@
                             <!-- Aquí se mostrará la matriz U -->
                             <pre id='resultTextU'>Aquí aparecerán los resultados de U.</pre>
                         </div>
-                        <div id='tabSolucion' class='tab-pane fade'>
+                        <div id='tabSolucion' class='tab-pane fade show active'>
                             <!-- Aquí se mostrará la solución -->
                             <pre id='resultTextSolucion'>Aquí aparecerán los resultados de la solución.</pre>
                         </div>
