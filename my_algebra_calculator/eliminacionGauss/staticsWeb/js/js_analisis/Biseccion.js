@@ -154,7 +154,7 @@ document.addEventListener("DOMContentLoaded", function () {
     function mostrarIteraciones(iteraciones) {
         document.getElementById('resultTextIter').innerHTML = `<h4>Iteraciones:</h4><ul>${iteraciones.map(paso => `<li>${paso}</li>`).join('')}</ul>`;
         activateTab('tabI');
-    }
+    }    
 
     // Función para activar la pestaña correspondiente
     function activateTab(tabId) {

@@ -88,7 +88,6 @@ class AnNumerico:
 
             if abs(func(c)) < tol:
                 solution = c
-                steps.append(f"Raíz aproximada encontrada en x = {c}")
                 break
 
             if func(a) * func(c) < 0:
@@ -96,8 +95,8 @@ class AnNumerico:
             else:
                 a = c
 
+        # Solo se calcula la raíz, pero no se agrega al resultado de las iteraciones
         if solution is None:
             solution = (a + b) / 2.0
-            steps.append(f"Raíz aproximada encontrada en x = {solution}")
-        
+        # Solo se devuelve el resultado de las iteraciones
         return steps, solution

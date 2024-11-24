@@ -750,7 +750,6 @@ def biSeccion_process(request):
 
 
 
-
 """@require_POST
 def biSeccion_process(request):
     logger.debug(f"Request POST data: {request.body.decode('utf-8')}")
