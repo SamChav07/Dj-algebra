@@ -50,7 +50,9 @@ class AnNumerico:
             steps, solution = self.bisection(func, self.a, self.b, self.tolerance)
 
             # Retorna los resultados (pasos y la raíz aproximada)
-            return {'solucion': solution, 'iteraciones': steps}
+            return {'solucion': f"Raíz aproximada: {solution}", 
+                    'numero_de_iteraciones': len(steps),
+                    'iteraciones': steps}
         except Exception as e:
             raise ValueError(f"Error en la ejecución de bisección: {e}")
 
@@ -98,5 +100,5 @@ class AnNumerico:
         # Solo se calcula la raíz, pero no se agrega al resultado de las iteraciones
         if solution is None:
             solution = (a + b) / 2.0
-        # Solo se devuelve el resultado de las iteraciones
+
         return steps, solution

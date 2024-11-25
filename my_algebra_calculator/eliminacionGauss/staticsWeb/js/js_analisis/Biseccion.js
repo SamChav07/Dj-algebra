@@ -139,26 +139,144 @@ document.addEventListener("DOMContentLoaded", function () {
     function mostrarResultados(data) {
         if (data.status === 'success') {
             const resultados = data.resultados;
-            mostrarSolucion(resultados.solucion);
+            mostrarSolucion(resultados);
             mostrarIteraciones(resultados.iteraciones);
         } else {
             console.error("Error en la respuesta:", data.message);
         }
     }
 
-    function mostrarSolucion(solucion) {
-        document.getElementById('resultTextS').innerHTML = `<h4>Solución:</h4><p>${solucion}</p>`;
+    function mostrarSolucion(resultados) {
+        // Extraer la raíz aproximada y las iteraciones desde el JSON de la respuesta
+        const raizAproximada = resultados.solucion;
+        const iteraciones = resultados.iteraciones;
+        
+        // Determinar el número máximo de iteraciones
+        const numeroIteraciones = iteraciones.length;  // El número de iteraciones es igual a la longitud del array de iteraciones
+    
+        // Mostrar la solución y el número de iteraciones
+        document.getElementById('resultTextS').innerHTML = `
+            <p>${raizAproximada}<br>Número de iteraciones: ${numeroIteraciones}</p>
+        `;
+        
+        // Activar la pestaña de solución
         activateTab('tabS');
     }
 
     function mostrarIteraciones(iteraciones) {
-        document.getElementById('resultTextIter').innerHTML = `<h4>Iteraciones:</h4><ul>${iteraciones.map(paso => `<li>${paso}</li>`).join('')}</ul>`;
-        activateTab('tabI');
-    }    
+        const iteracionesContainer = document.getElementById('resultTextIter');
 
-    // Función para activar la pestaña correspondiente
+        // Almacenamos todas las iteraciones en un contenedor oculto para hacer la búsqueda
+        const allIterationsHtml = iteraciones.map(paso => `<li>${paso}</li>`).join('');
+        iteracionesContainer.innerHTML = `<h4>Iteraciones:</h4><ul id="iteracionesList">${allIterationsHtml}</ul>`;
+
+        // Habilitar la búsqueda
+        activateTab('tabI');
+    }
+
+    // Mostrar el campo de entrada para buscar iteración específica al hacer clic en la lupa
+    document.getElementById('searchIcon').addEventListener('click', function() {
+        const input = document.getElementById('iterationInput');
+        input.style.display = input.style.display === 'none' ? 'block' : 'none';
+        input.focus();
+    });
+
+    // Función para mostrar la iteración específica ingresada cuando se presione "Enter"
+    document.getElementById('iterationInput').addEventListener('keypress', function(event) {
+        if (event.key === "Enter") { // Solo se activa cuando se presiona Enter
+            showSpecificIteration();
+        }
+    });
+
+    function showSpecificIteration() {
+        const iterationNumber = parseInt(document.getElementById('iterationInput').value, 10);
+
+        if (!isNaN(iterationNumber) && iterationNumber > 0) {
+            const iteraciones = document.getElementById('iteracionesList').getElementsByTagName('li');
+            const iteration = iteraciones[iterationNumber - 1];  // Iteración ingresada (1-indexed)
+
+            if (iteration) {
+                const iterationContent = iteration.textContent.trim();
+
+                // Procesamos el contenido de la iteración para extraer y mostrar los datos
+                const iterationDetails = iterationContent.split(", ");
+                let formattedMessage = `Iteración ${iterationNumber}:\n`;
+
+                iterationDetails.forEach((detail, index) => {
+                    formattedMessage += `${detail}\n`;
+                });
+
+                // Mostrar la iteración en una ventana emergente ordenada
+                alert(formattedMessage);
+            } else {
+                alert('Iteración no encontrada.');
+            }
+        } else {
+            alert('Por favor ingrese un número válido de iteración.');
+        }
+    }
+
     function activateTab(tabId) {
         const tab = document.querySelector(`a[href="#${tabId}"]`);
         if (tab) tab.click();
     }
 });
+
+document.addEventListener("DOMContentLoaded", function () {
+    const functionInput = document.getElementById("id_functionInput");
+    const renderedFunctionView = document.getElementById("renderedFunctionView");
+    const desmosContainer = document.getElementById("desmos-graph");
+
+    // Inicializar Desmos
+    const calculator = Desmos.GraphingCalculator(desmosContainer, { expressions: true });
+
+    function mostrarSolucion(resultados) {
+        const raizAproximada = resultados.solucion;
+        const iteraciones = resultados.iteraciones;
+
+        document.getElementById('resultTextS').innerHTML = `
+            <p>Raíz aproximada: ${raizAproximada}<br>
+            Número de iteraciones: ${iteraciones.length}</p>
+        `;
+
+        // Graficar función en Desmos
+        calculator.setExpression({ id: 'graph1', latex: `y=${functionInput.value}` });
+        if (!isNaN(raizAproximada)) {
+            calculator.setExpression({ id: 'root', latex: `(${raizAproximada}, 0)` });
+        }
+    }
+
+    function mostrarIteraciones(iteraciones) {
+        const iteracionesContainer = document.getElementById('resultTextIter');
+        iteracionesContainer.innerHTML = `
+            <h4>Iteraciones:</h4>
+            <ul id="iteracionesList">
+                ${iteraciones.map((iter, idx) => `<li>Iteración ${idx + 1}: ${iter}</li>`).join('')}
+            </ul>
+        `;
+    }
+
+    // Buscar iteración específica
+    document.getElementById('searchIcon').addEventListener('click', function () {
+        const input = document.getElementById('iterationInput');
+        input.style.display = input.style.display === 'none' ? 'block' : 'none';
+        input.focus();
+    });
+
+    // Mostrar iteración específica
+    document.getElementById('iterationInput').addEventListener('change', function () {
+        const iteracionNum = parseInt(this.value, 10) - 1;
+        const iteraciones = document.querySelectorAll('#iteracionesList li');
+        if (iteraciones[iteracionNum]) {
+            alert(iteraciones[iteracionNum].textContent);
+        } else {
+            alert('Iteración no encontrada.');
+        }
+    });
+});
+
+document.getElementById('id_functionInput').addEventListener('input', function() {
+    var inputValue = this.value;
+
+    document.getElementById('functionInput').value = inputValue;
+})
