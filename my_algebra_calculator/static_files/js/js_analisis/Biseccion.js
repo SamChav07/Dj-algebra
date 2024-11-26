@@ -220,66 +220,63 @@ document.addEventListener("DOMContentLoaded", function () {
         const tab = document.querySelector(`a[href="#${tabId}"]`);
         if (tab) tab.click();
     }
-
-    // Función para reinterpretar los símbolos
-    function reinterpretInput(input) {
-        // Iterar sobre cada elemento en buttonsConfig
-        buttonsConfig.forEach(([button, replacement]) => {
-            // Reemplazar el texto del input por la interpretación correspondiente
-            const regex = new RegExp(escapeRegExp(button), 'g');
-            input = input.replace(regex, replacement);
-        });
-        return input;
-    }
-
-    // Función para escapar caracteres especiales en las expresiones regulares
-    function escapeRegExp(string) {
-        return string.replace(/[.*+?^=!:${}()|\[\]\/\\]/g, '\\$&');
-    }
-
-    async function plotGraph() {
-        const functionInput = document.getElementById('functionInput').value.trim();
-        const errorMessage = document.getElementById('errorMessage');
-    
-        if (!functionInput) {
-            errorMessage.innerText = "Por favor, ingresa una función válida.";
-            return;
-        }
-    
-        try {
-            // Petición al servidor
-            const response = await fetch(`/generate_plot_data/?function=${encodeURIComponent(functionInput)}`);
-            const data = await response.json();
-    
-            if (data.error) {
-                errorMessage.innerText = data.error;
-                return;
-            }
-    
-            // Configuración del gráfico
-            const trace = {
-                x: data.x,
-                y: data.y,
-                mode: 'lines',
-                line: { color: '#17a2b8', width: 2 },
-                name: `y = ${data.function}`
-            };
-    
-            const layout = {
-                title: `Gráfica de y = ${data.function}`,
-                xaxis: { title: 'x', zeroline: true },
-                yaxis: { title: 'y', zeroline: true },
-                plot_bgcolor: '#1e1e1e',
-                paper_bgcolor: '#2c2c2c',
-                font: { color: 'white' }
-            };
-    
-            // Renderizar la gráfica
-            Plotly.newPlot('chart', [trace], layout);
-            errorMessage.innerText = "";
-        } catch (error) {
-            errorMessage.innerText = "Error al generar la gráfica.";
-            console.error(error);
-        }
-    }    
 });
+
+document.addEventListener("DOMContentLoaded", function () {
+    const functionInput = document.getElementById("id_functionInput");
+    const renderedFunctionView = document.getElementById("renderedFunctionView");
+    const desmosContainer = document.getElementById("desmos-graph");
+
+    // Inicializar Desmos
+    const calculator = Desmos.GraphingCalculator(desmosContainer, { expressions: true });
+
+    function mostrarSolucion(resultados) {
+        const raizAproximada = resultados.solucion;
+        const iteraciones = resultados.iteraciones;
+
+        document.getElementById('resultTextS').innerHTML = `
+            <p>Raíz aproximada: ${raizAproximada}<br>
+            Número de iteraciones: ${iteraciones.length}</p>
+        `;
+
+        // Graficar función en Desmos
+        calculator.setExpression({ id: 'graph1', latex: `y=${functionInput.value}` });
+        if (!isNaN(raizAproximada)) {
+            calculator.setExpression({ id: 'root', latex: `(${raizAproximada}, 0)` });
+        }
+    }
+
+    function mostrarIteraciones(iteraciones) {
+        const iteracionesContainer = document.getElementById('resultTextIter');
+        iteracionesContainer.innerHTML = `
+            <h4>Iteraciones:</h4>
+            <ul id="iteracionesList">
+                ${iteraciones.map((iter, idx) => `<li>Iteración ${idx + 1}: ${iter}</li>`).join('')}
+            </ul>
+        `;
+    }
+
+    // Buscar iteración específica
+    document.getElementById('searchIcon').addEventListener('click', function () {
+        const input = document.getElementById('iterationInput');
+        input.style.display = input.style.display === 'none' ? 'block' : 'none';
+        input.focus();
+    });
+
+    // Mostrar iteración específica
+    document.getElementById('iterationInput').addEventListener('change', function () {
+        const iteracionNum = parseInt(this.value, 10) - 1;
+        const iteraciones = document.querySelectorAll('#iteracionesList li');
+        if (iteraciones[iteracionNum]) {
+            alert(iteraciones[iteracionNum].textContent);
+        } else {
+            alert('Iteración no encontrada.');
+        }
+    });
+});
+
+document.getElementById('id_functionInput').addEventListener('input', function() {
+    var inputValue = this.value;
+
+    document.getElementById('functionInput').value = inputValue;
+})

@@ -12,6 +12,8 @@ from .logic.vector import Vector
 from .logic.matrizxvector import MxV
 from .logic.analisis_num import AnNumerico
 
+import numpy as np
+
 # Configure logging
 logger = logging.getLogger(__name__)
 
@@ -25,7 +27,7 @@ def mainNumAnalisis_view(request):
     return render(request, 'main/mainNumericoAnalisis.html')
 
 def aboutU_view(request):
-    return render(request, 'main/aboUs.html')
+    return render(request, 'services/aboUs.html')
 
 #1 Vista para la eliminación de Gauss
 def escalonar_view(request):
@@ -746,59 +748,20 @@ def biSeccion_process(request):
         logger.error(f"Error inesperado: {str(e)}")
         return JsonResponse({'status': 'error', 'message': f"Error inesperado: {str(e)}"}, status=500)
 
-
-
-
-
-"""@require_POST
-def biSeccion_process(request):
-    logger.debug(f"Request POST data: {request.body.decode('utf-8')}")
-
+def generate_plot_data(request):
+    function = request.GET.get('function', '')
+    if not function:
+        return JsonResponse({'error': 'No se proporcionó ninguna función.'})
+    
     try:
-        # Intentar cargar los datos como JSON
-        data = json.loads(request.body)
+        # Generar valores de x e y
+        x = np.linspace(-10, 10, 500)  # 500 puntos en el rango [-10, 10]
+        y = [eval(function.replace('x', str(value))) for value in x]
 
-        # Verificar que el JSON contiene las claves necesarias
-        bi_funcion_data = data.get("bi_funcion")
-        if not bi_funcion_data:
-            logger.error("El campo 'bi_funcion' no se encuentra en el cuerpo de la solicitud.")
-            return JsonResponse({'status': 'error', 'message': "El campo 'bi_funcion' es obligatorio."}, status=400)
-
-        # Validar que `bi_funcion` contiene `bi_funcion` y `bi_AB`
-        bi_funcion_json = json.loads(bi_funcion_data)  # Convertir el string JSON en diccionario
-        if "bi_funcion" not in bi_funcion_json or "bi_AB" not in bi_funcion_json:
-            logger.error("Faltan claves obligatorias en el JSON de 'bi_funcion'.")
-            return JsonResponse({'status': 'error', 'message': "El JSON debe contener 'bi_funcion' y 'bi_AB'."}, status=400)
-
-        # Guardar el dato en el modelo
-        registro = biSeccion.objects.create(
-            bi_funcion=bi_funcion_json,
-            bi_resultado=None  # Inicialmente vacío
-        )
-        logger.info(f"Registro creado exitosamente con ID: {registro.id}")
-
-        # Procesar los datos con AnNumerico
-        an_num = AnNumerico(bi_funcion_json)
-        resultado = an_num.run_bisection()
-
-        # Actualizar el resultado en el modelo
-        registro.bi_resultado = {"pasos": resultado}
-        registro.save()
-        logger.info(f"Resultado almacenado para el registro ID: {registro.id}")
-
-        # Responder con el resultado del cálculo
         return JsonResponse({
-            'status': 'success',
-            'message': f"Registro procesado exitosamente con ID: {registro.id}",
-            'resultados': resultado
+            'x': x.tolist(),
+            'y': y,
+            'function': function
         })
-
-    except json.JSONDecodeError:
-        logger.error("El cuerpo de la solicitud no contiene un JSON válido.")
-        return JsonResponse({'status': 'error', 'message': 'Formato JSON inválido en el cuerpo de la solicitud.'}, status=400)
-    except ValueError as e:
-        logger.error(f"Error en los datos de bi_funcion: {str(e)}")
-        return JsonResponse({'status': 'error', 'message': str(e)}, status=400)
     except Exception as e:
-        logger.error(f"Error inesperado: {str(e)}")
-        return JsonResponse({'status': 'error', 'message': f"Error inesperado: {str(e)}"}, status=500)"""
+        return JsonResponse({'error': f'Error al evaluar la función: {str(e)}'})
