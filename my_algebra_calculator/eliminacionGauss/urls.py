@@ -56,4 +56,6 @@ urlpatterns = [
     path('bi/', bi_view, name='bi_view'),
     path('get_existing_ids_bi/', get_existing_ids_bi, name='get_existing_ids_bi'),  # Vista para obtener los IDs existentes
     path('biSeccion/process/', biSeccion_process, name='biSeccion_process'),  # Vista para procesar la transposición de la matriz
+    #13
+    path('newRaphson/', newRaphson_view, name='newRaphson_view'),
 ]

@@ -4,8 +4,8 @@ import logging
 import json
 from django.shortcuts import render
 from django.http import JsonResponse
-from .models import Elim_Gauss, Ope_combinadas, MultiFxC, PropMxV, SmMrx, TrnsMtx, multMtrX, ClcDeterm, InvMtrx, RglCramer, factLU, biSeccion
-from .forms import ElimGaussForm, CombVectorForm, MultiFxCForm, PropMxVForm, SmMrxForm, TrnsMtxForm, MultMtrXForm, ClcDetermForm, InvMtrxForm, RglCramerForm, factLUForm, biSeccionForm
+from .models import Elim_Gauss, Ope_combinadas, MultiFxC, PropMxV, SmMrx, TrnsMtx, multMtrX, ClcDeterm, InvMtrx, RglCramer, factLU, biSeccion, nRaphson
+from .forms import ElimGaussForm, CombVectorForm, MultiFxCForm, PropMxVForm, SmMrxForm, TrnsMtxForm, MultMtrXForm, ClcDetermForm, InvMtrxForm, RglCramerForm, factLUForm, biSeccionForm, nRaphsonForm
 from django.views.decorators.http import require_POST
 from .logic.matriz import Matriz
 from .logic.vector import Vector
@@ -765,3 +765,7 @@ def generate_plot_data(request):
         })
     except Exception as e:
         return JsonResponse({'error': f'Error al evaluar la función: {str(e)}'})
+
+def newRaphson_view(request):
+    form = nRaphsonForm()  
+    return render(request, 'analisisNm/newRaphson.html', {'form': form})  

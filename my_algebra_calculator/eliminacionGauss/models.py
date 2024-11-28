@@ -94,8 +94,16 @@ class factLU(models.Model):
     def __str__(self):
         return f"self.factLU {self.id}"
 
+# Método de Bisección
 class biSeccion(models.Model):
     bi_funcion = models.JSONField()
     bi_resultado = models.JSONField(null=True, blank=True) 
     def __str__(self):
         return f"self.biSeccion {self.id}"
+
+# Newton - Raphson
+class nRaphson(models.Model):
+    new_funcion = models.JSONField()
+    new_resultado = models.JSONField(null=True, blank=True)  
+    def __str__(self):
+        return f"self.nRaphson {self.id}"

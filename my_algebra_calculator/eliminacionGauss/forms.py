@@ -155,5 +155,17 @@ class biSeccionForm(forms.ModelForm):
             'bi_funcion': forms.Textarea(attrs={'rows': 10, 'cols': 40, 'placeholder': 'Ejemplo: x^2 - 4'}),        
         }
         labels = {
-            'bi_funcion': 'bi_funcion (en formato Text)',
+            'bi_funcion': 'bi_funcion (en formato JSON)',
+        }
+
+#Forms13
+class nRaphsonForm(forms.ModelForm):
+    class Meta:
+        model = nRaphson
+        fields = ['new_funcion']
+        widgets = {
+            'new_funcion': forms.Textarea(attrs={'rows': 10, 'cols': 40, 'placeholder': 'Ejemplo: x^2 - 4'}),        
+        }
+        labels = {
+            'new_funcion': 'new_funcion (en formato JSON)',
         }
