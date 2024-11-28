@@ -2,6 +2,7 @@
 
 from django import forms
 from .models import *
+import json
 
 #Forms01
 class ElimGaussForm(forms.ModelForm):
@@ -14,17 +15,6 @@ class ElimGaussForm(forms.ModelForm):
         labels = {
             'EG_matriz': 'Matriz (en formato JSON)',
         }
-
-    def clean_EG_matriz(self):
-        """Método para validar el campo EG_matriz."""
-        matriz = self.cleaned_data.get('EG_matriz')
-        try:
-            # Validar si la matriz es un JSON válido
-            import json
-            json.loads(matriz)
-        except (ValueError, TypeError):
-            raise forms.ValidationError("El formato de la matriz no es válido. Debe ser un JSON.")
-        return matriz
 
 #Forms02
 class CombVectorForm(forms.ModelForm):
@@ -40,26 +30,6 @@ class CombVectorForm(forms.ModelForm):
             'OpV_escalares': 'Escalares (en formato JSON)',
         }
 
-    def clean_OpV_vectores(self):
-        """Método para validar el campo OpV_vectores."""
-        vectores = self.cleaned_data.get('OpV_vectores')
-        try:
-            import json
-            json.loads(vectores)
-        except (ValueError, TypeError):
-            raise forms.ValidationError("El formato de los vectores no es válido. Debe ser un JSON.")
-        return vectores
-
-    def clean_OpV_escalares(self):
-        """Método para validar el campo OpV_escalares."""
-        escalares = self.cleaned_data.get('OpV_escalares')
-        try:
-            import json
-            json.loads(escalares)
-        except (ValueError, TypeError):
-            raise forms.ValidationError("El formato de los escalares no es válido. Debe ser un JSON.")
-        return escalares
-
 #Forms03
 class MultiFxCForm(forms.ModelForm):
     class Meta:
@@ -73,26 +43,6 @@ class MultiFxCForm(forms.ModelForm):
             'Mfc_Fila': 'Fila (en formato JSON)',
             'Mfc_Column': 'Columna (en formato JSON)',
         }
-
-    def clean_Mfc_Fila(self):
-        """Método para validar el campo Mfc_Fila."""
-        fila = self.cleaned_data.get('Mfc_Fila')
-        try:
-            import json
-            json.loads(fila)
-        except (ValueError, TypeError):
-            raise forms.ValidationError("El formato de la fila no es válido. Debe ser un JSON.")
-        return fila
-
-    def clean_Mfc_Column(self):
-        """Método para validar el campo Mfc_Column."""
-        columna = self.cleaned_data.get('Mfc_Column')
-        try:
-            import json
-            json.loads(columna)
-        except (ValueError, TypeError):
-            raise forms.ValidationError("El formato de la columna no es válido. Debe ser un JSON.")
-        return columna
 
 #Forms04
 class PropMxVForm(forms.ModelForm):
@@ -110,33 +60,6 @@ class PropMxVForm(forms.ModelForm):
             'pMxV_vectorV': 'VectorV (en formato JSON)',
         }
 
-    def clean_pMxV_matrix(self):
-        """Método para validar el campo pMxV_matrix."""
-        matrix = self.cleaned_data.get('pMxV_matrix')
-        try:
-            json.loads(matrix)
-        except (ValueError, TypeError):
-            raise forms.ValidationError("El formato de la matriz no es válido. Debe ser un JSON.")
-        return matrix
-
-    def clean_pMxV_vectorU(self):
-        """Método para validar el campo pMxV_vectorU."""
-        vector_u = self.cleaned_data.get('pMxV_vectorU')
-        try:
-            json.loads(vector_u)
-        except (ValueError, TypeError):
-            raise forms.ValidationError("El formato del vector U no es válido. Debe ser un JSON.")
-        return vector_u
-
-    def clean_pMxV_vectorV(self):
-        """Método para validar el campo pMxV_vectorV."""
-        vector_v = self.cleaned_data.get('pMxV_vectorV')
-        try:
-            json.loads(vector_v)
-        except (ValueError, TypeError):
-            raise forms.ValidationError("El formato del vector V no es válido. Debe ser un JSON.")
-        return vector_v
-
 #Forms05
 class SmMrxForm(forms.ModelForm):
     class Meta:
@@ -151,27 +74,98 @@ class SmMrxForm(forms.ModelForm):
             'sMrx_escalares': 'Escalares (en formato JSON)',
         }
 
-    def clean_sMrx_matrxS(self):
-        """Método para validar el campo sMrx_matrxS."""
-        matrices = self.cleaned_data.get('sMrx_matrxS')
-        try:
-            matrix_list = json.loads(matrices)
-            if not isinstance(matrix_list, list):
-                raise forms.ValidationError("El formato de las matrices no es válido. Debe ser un JSON que contenga una lista de matrices.")
-            for matrix in matrix_list:
-                if not isinstance(matrix, list):
-                    raise forms.ValidationError("Cada matriz debe ser una lista.")
-        except (ValueError, TypeError):
-            raise forms.ValidationError("El formato de las matrices no es válido. Debe ser un JSON.")
-        return matrices
+#Forms06
+class TrnsMtxForm(forms.ModelForm):
+    class Meta:
+        model = TrnsMtx
+        fields = ['trMx_Matriz']
+        widgets = {
+            'trMx_Matriz': forms.Textarea(attrs={'rows': 10, 'cols': 40}),
+        }
+        labels = {
+            'trMx_Matriz': 'Matriz (en formato JSON)',
+        }
 
-    def clean_sMrx_escalares(self):
-        """Método para validar el campo sMrx_escalares."""
-        escalares = self.cleaned_data.get('sMrx_escalares')
-        try:
-            escalar_list = json.loads(escalares)
-            if not isinstance(escalar_list, list):
-                raise forms.ValidationError("El formato de los escalares no es válido. Debe ser un JSON que contenga una lista de escalares.")
-        except (ValueError, TypeError):
-            raise forms.ValidationError("El formato de los escalares no es válido. Debe ser un JSON.")
-        return escalares
+#Forms07
+class MultMtrXForm(forms.ModelForm):
+    class Meta:
+        model = multMtrX
+        fields = ['mMrx_Matrx']  # Include fields you want in the form
+        widgets = {
+            'mMrx_Matrx': forms.Textarea(attrs={'rows': 10, 'cols': 40, 'placeholder': 'Ejemplo: [[1, 2], [3, 4]]'}),
+        }
+        labels = {
+            'mMrx_Matrx': 'Matriz (en formato JSON)',
+        }
+
+#Forms08
+class ClcDetermForm(forms.ModelForm):
+    class Meta:
+        model = ClcDeterm
+        fields = ['cldt_Matrx']
+        widgets = {
+            'cldt_Matrx': forms.Textarea(attrs={'rows': 10, 'cols': 40, 'placeholder': 'Ejemplo: [[1, 2], [3, 4]]'}),
+        }
+        labels = {
+            'cldt_Matrx': 'Matriz (en formato JSON)',
+        }
+
+#Forms09
+class InvMtrxForm(forms.ModelForm):
+    class Meta:
+        model = InvMtrx
+        fields = ['inmx_Matrx']
+        widgets = {
+            'inmx_Matrx': forms.Textarea(attrs={'rows': 10, 'cols': 40, 'placeholder': 'Ejemplo: [[1, 2], [3, 4]]'}),
+        }
+        labels = {
+            'inmx_Matrx': 'Matriz (en formato JSON)',
+        }
+
+#Forms10
+class RglCramerForm(forms.ModelForm):
+    class Meta:
+        model = RglCramer
+        fields = ['cramer_Matrx']
+        widgets = {
+            'cramer_Matrx': forms.Textarea(attrs={'rows': 10, 'cols': 40, 'placeholder': 'Ejemplo: [[1, 2], [3, 4]]'}),
+        }
+        labels = {
+            'cramer_Matrx': 'Matriz (en formato JSON)',
+        }
+
+#Forms11
+class factLUForm(forms.ModelForm):
+    class Meta:
+        model = factLU
+        fields = ['lu_mtrx']
+        widgets = {
+            'lu_mtrx': forms.Textarea(attrs={'rows': 10, 'cols': 40, 'placeholder': 'Ejemplo: [[1, 2], [3, 4]]'}),        
+        }
+        labels = {
+            'lu_mtrx': 'Matriz (en formato JSON)',
+        }
+
+#Forms12
+class biSeccionForm(forms.ModelForm):
+    class Meta:
+        model = biSeccion
+        fields = ['bi_funcion'] 
+        widgets = {
+            'bi_funcion': forms.Textarea(attrs={'rows': 10, 'cols': 40, 'placeholder': 'Ejemplo: x^2 - 4'}),        
+        }
+        labels = {
+            'bi_funcion': 'bi_funcion (en formato JSON)',
+        }
+
+#Forms13
+class nRaphsonForm(forms.ModelForm):
+    class Meta:
+        model = nRaphson
+        fields = ['new_funcion']
+        widgets = {
+            'new_funcion': forms.Textarea(attrs={'rows': 10, 'cols': 40, 'placeholder': 'Ejemplo: x^2 - 4'}),        
+        }
+        labels = {
+            'new_funcion': 'new_funcion (en formato JSON)',
+        }

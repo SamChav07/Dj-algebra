@@ -46,3 +46,64 @@ class SmMrx(models.Model):
     sMrx_ecuaciones = models.JSONField(null=True, blank=True)
     def __str__(self):
         return f"SmMrx {self.id}"
+
+#Transposicion de Matrices 
+class TrnsMtx(models.Model):
+    trMx_Matriz = models.JSONField()  #Guarda la matriz completa 
+    trMx_resultado = models.JSONField(null=True, blank=True)  # Resultado de la eliminación gaussiana
+    trMx_ecuaciones = models.TextField(null=True, blank=True)  # Guarda los procedimientos
+    def __str__(self):
+        return f"TrnsMtx {self.id}"
+
+#Multiplicacion de matrices
+class multMtrX(models.Model):
+    mMrx_Matrx = models.JSONField()
+    mMrx_resultado = models.JSONField(null=True, blank=True) 
+    mMrx_ecuaciones = models.TextField(null=True, blank=True)
+    def __str__(self):
+        return f"multMtrX {self.id}"
+
+#Calculo de Determinantes 
+class ClcDeterm(models.Model):
+    cldt_Matrx = models.JSONField()
+    cldt_resultado = models.JSONField(null=True, blank=True) 
+    cldt_ecuaciones = models.TextField(null=True, blank=True)
+    def __str__(self):
+        return f"clcDeterm {self.id}"
+
+#Calculo de Inversa de una matriz 
+class InvMtrx(models.Model):
+    inmx_Matrx = models.JSONField()
+    inmx_resultado = models.JSONField(null=True, blank=True) 
+    inmx_ecuaciones = models.TextField(null=True, blank=True)
+    def __str__(self):
+        return f"InvMtrx {self.id}"
+
+#Calculo Sistema con Regla de Cramer
+class RglCramer(models.Model):
+    cramer_Matrx = models.JSONField()
+    cramer_resultado = models.JSONField(null=True, blank=True) 
+    cramer_ecuaciones = models.TextField(null=True, blank=True)
+    def __str__(self):
+        return f"RglCramer {self.id}"
+
+class factLU(models.Model):
+    lu_mtrx = models.JSONField()
+    lu_resultado = models.JSONField(null=True, blank=True) 
+    lu_ecuaciones = models.JSONField(null=True, blank=True) 
+    def __str__(self):
+        return f"self.factLU {self.id}"
+
+# Método de Bisección
+class biSeccion(models.Model):
+    bi_funcion = models.JSONField()
+    bi_resultado = models.JSONField(null=True, blank=True) 
+    def __str__(self):
+        return f"self.biSeccion {self.id}"
+
+# Newton - Raphson
+class nRaphson(models.Model):
+    new_funcion = models.JSONField()
+    new_resultado = models.JSONField(null=True, blank=True)  
+    def __str__(self):
+        return f"self.nRaphson {self.id}"

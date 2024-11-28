@@ -1,0 +1,136 @@
+{% load static %}
+
+<!doctype html>
+<html lang="en" data-bs-theme="auto">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CalcX</title>
+
+    <script src="https://getbootstrap.com/docs/5.3/assets/js/color-modes.js"></script>
+    <link rel="canonical" href="https://getbootstrap.com/docs/5.3/examples/product/">
+    <!-- DocSearch CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@docsearch/css@3">
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <style>
+        body {
+            background-color: #343a40; /* Fondo oscuro */
+            color: #fff;
+        }
+
+        .text-bg-dark:hover, .bg-body-tertiary:hover {
+            box-shadow: 0px 0px 20px rgba(255, 255, 255, 0.6); /* Sombra luminosa */
+            transform: scale(1.05); /* Pequeño efecto de zoom */
+            transition: all 0.3s ease-in-out; /* Transición suave */
+        }
+
+        .team-card {
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            background-color: #454d55; /* Fondo de la tarjeta */
+            border: 1px solid #555; /* Borde oscuro */
+            border-radius: 8px; /* Bordes redondeados */
+        }
+
+        .team-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 0 20px rgba(255, 255, 255, 0.2);
+        }
+
+        .team-img {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 4px solid #fff;
+        }
+
+        .card-title {
+            font-size: 1.3rem;
+            font-weight: bold;
+            color: #f8f9fa; /* Color de texto claro */
+        }
+
+        .card-text {
+            font-size: 1rem;
+            color: #adb5bd; /* Texto más suave para las descripciones */
+        }
+
+        footer {
+            background-color: #212529; /* Fondo oscuro en el pie de página */
+            color: #fff;
+        }
+    </style>
+
+    <!-- Custom styles for this template -->
+    <link href="{% static 'css/product.css' %}" rel="stylesheet">
+</head>
+
+<body>
+    <div class="container mt-5">
+        <h1 class="text-center mb-4 text-primary">About Us</h1>
+        <p class="text-center lead mb-5">Welcome to CalcX, where innovation meets technology.</p>
+
+        <!-- TEAM SECTION -->
+        <div class="my-5">
+            <h2 class="text-center mb-4 text-light">Meet Our Team</h2>
+            <div class="row row-cols-1 row-cols-md-3 g-4">
+                <div class="col">
+                    <div class="card team-card text-center">
+                        <img src="https://via.placeholder.com/150" alt="Andrés" class="team-img mx-auto mt-3">
+                        <div class="card-body">
+                            <h5 class="card-title">Andrés</h5>
+                            <p class="card-text">Lead Developer</p>
+                            <p class="card-text">Expert in back-end development and passionate about new technologies.</p>
+                            <a href="#" class="btn btn-primary btn-sm">View Profile</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="col">
+                    <div class="card team-card text-center">
+                        <img src="{% static 'assets/Himno-de-Tailandia.jpg' %}" alt="Silvio" class="team-img mx-auto mt-3">
+                        <div class="card-body">
+                            <h5 class="card-title">Silvio</h5>
+                            <p class="card-text">Project Manager</p>
+                            <p class="card-text">Organizing the chaos and ensuring our projects are on track.</p>
+                            <a href="#" class="btn btn-primary btn-sm">View Profile</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="col">
+                    <div class="card team-card text-center">
+                        <img src="https://via.placeholder.com/150" alt="Haley" class="team-img mx-auto mt-3">
+                        <div class="card-body">
+                            <h5 class="card-title">Haley</h5>
+                            <p class="card-text">UX/UI Designer</p>
+                            <p class="card-text">Designing beautiful and user-friendly interfaces.</p>
+                            <a href="#" class="btn btn-primary btn-sm">View Profile</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="col">
+                    <div class="card team-card text-center">
+                        <img src="https://via.placeholder.com/150" alt="Samuel" class="team-img mx-auto mt-3">
+                        <div class="card-body">
+                            <h5 class="card-title">Samuel</h5>
+                            <p class="card-text">El más prron</p>
+                            <p class="card-text">The funniest and most creative member of the team.</p>
+                            <a href="#" class="btn btn-primary btn-sm">View Profile</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- FOOTER -->
+    <footer class="text-center py-4">
+        <p>&copy; 2024 My Algebra Calculator. All rights reserved.</p>
+    </footer>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
