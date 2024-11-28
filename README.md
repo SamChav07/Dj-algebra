@@ -1,6 +1,6 @@
 # Dj-algebra
 
-![Logo de calcX](https://github.com/SamChav07/Dj-algebra/raw/main/my_algebra_calculator/eliminacionGauss/static/assets/calcXlogo.svg)
+![Logo de calcX](https://github.com/SamChav07/Dj-algebra/raw/main/my_algebra_calculator/eliminacionGauss/staticWeb/assets/calcXlogo.svg)
 
 ## Modulos actuales
 - |-> Método Escalonado
