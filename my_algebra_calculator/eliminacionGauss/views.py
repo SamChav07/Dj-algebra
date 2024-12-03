@@ -29,6 +29,9 @@ def mainNumAnalisis_view(request):
 def aboutU_view(request):
     return render(request, 'services/aboUs.html')
 
+def product_view(request):
+    return render(request, 'services/product.html')
+
 #1 Vista para la eliminación de Gauss
 def escalonar_view(request):
     form = ElimGaussForm()  
