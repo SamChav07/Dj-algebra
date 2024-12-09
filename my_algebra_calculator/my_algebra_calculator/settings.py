@@ -7,7 +7,7 @@ SECRET_KEY = 'django-insecure-r3w^#h=hv5q1i-4jr%$@+8&%hb5&_ni895e95$jhgs283n#i6l
 
 DEBUG = False
 
-ALLOWED_HOSTS = ['localhost', '127.0.0.1', '*']
+ALLOWED_HOSTS = ['localhost', '127.0.0.1', 'calcx-kenaro-team.netlify.app/']
 
 
 INSTALLED_APPS = [
@@ -84,9 +84,9 @@ USE_I18N = True
 USE_TZ = True
 
 STATIC_URL = '/static/'
-STATICFILES_DIRS = [os.path.join(BASE_DIR, 'eliminacionGauss/staticsWeb')]
+STATICFILES_DIRS = [os.path.join(BASE_DIR, 'eliminacionGauss/staticsWeb', )]
 STATIC_ROOT = os.path.join(BASE_DIR, 'static_files')
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-CSRF_TRUSTED_ORIGINS = ['http://127.0.0.1', 'http://localhost:8000', '*']
+CSRF_TRUSTED_ORIGINS = ['http://127.0.0.1', 'http://localhost:8000', 'https://calcx-kenaro-team.netlify.app/']

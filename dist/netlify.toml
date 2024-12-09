@@ -1,2 +1,0 @@
- [build] 
-command = "python manage.py collectstatic --noinput" publish = "my_algebra_calculator/static_files"
