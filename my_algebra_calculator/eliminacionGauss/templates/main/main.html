@@ -184,8 +184,14 @@
                             <svg class="bi" width="24" height="24"><use xlink:href="#aperture"/></svg>
                         </a></li>
                             <li class="nav-item"><a class="nav-link" href="#">Inicio</a></li>
-                            <li class="nav-item"><a class="nav-link" href="#">Tour</a></li>
-                            <li class="nav-item"><a class="nav-link" href="#">Product</a></li>
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">Cursos</a>
+                                <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+                                    <li><a class="dropdown-item" href="{% url "mainAlgebra_view" %}">Álgebra</a></li>
+                                    <li><a class="dropdown-item" href="#">Análisis</a></li>
+                                </ul>
+                            </li>
+                            <li class="nav-item"><a class="nav-link" href="{% url "product_view" %}">Product</a></li>
                             <li class="nav-item"><a class="nav-link" href="{% url "aboutU_view" %}">About Us</a></li>
                         </a></li>
                         </ul>
@@ -194,11 +200,13 @@
             </div>
         </nav>
 
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+
         <main>
             <div class="position-relative overflow-hidden p-3 p-md-5 m-md-3 text-center bg-body-tertiary">
                 <div class="col-md-6 p-lg-5 mx-auto my-5">
-                    <h1 class="display-3 fw-bold">Designed for algebra enthusiasts</h1>
-                    <h3 class="fw-normal text-muted mb-3">Solve complex algebraic problems effortlessly with calcX</h3>
+                    <h1 class="display-3 fw-bold">Diseñado para entusiastas del álgebra</h1>
+                    <h3 class="fw-normal text-muted mb-3">Resuelva problemas algebraicos complejos sin esfuerzo con calcX</h3>
                     <div class="d-flex gap-3 justify-content-center lead fw-normal">
                         <a class="icon-link" href="#">
                         Discover more
