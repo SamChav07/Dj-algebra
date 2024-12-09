@@ -5,9 +5,10 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 SECRET_KEY = 'django-insecure-r3w^#h=hv5q1i-4jr%$@+8&%hb5&_ni895e95$jhgs283n#i6l'
 
-DEBUG = True
+DEBUG = False
 
-ALLOWED_HOSTS = ['localhost', '127.0.0.1', '2a29-190-212-216-195.ngrok-free.app']
+ALLOWED_HOSTS = ['localhost', '127.0.0.1', '*']
+
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -29,6 +30,7 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'livereload.middleware.LiveReloadScript',  # Asegúrate de que este middleware solo esté ahí si livereload está instalado
+    'whitenoise.middleware.WhiteNoiseMiddleware',
 ]
 
 ROOT_URLCONF = 'my_algebra_calculator.urls'
@@ -87,4 +89,4 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'static_files')
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-CSRF_TRUSTED_ORIGINS = ['http://127.0.0.1', 'http://localhost:8000', 'https://2a29-190-212-216-195.ngrok-free.app']
+CSRF_TRUSTED_ORIGINS = ['http://127.0.0.1', 'http://localhost:8000', '*']
