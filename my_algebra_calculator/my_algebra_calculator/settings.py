@@ -99,4 +99,4 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'static_files')
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-CSRF_TRUSTED_ORIGINS = ['http://127.0.0.1', 'http://localhost:8000','https://calcx.pythonanywhere.com/']
+CSRF_TRUSTED_ORIGINS = ['http://127.0.0.1', 'http://localhost:8000','calcx-kenaro-team-aqv66us0b-samchav07s-projects.vercel.app']
