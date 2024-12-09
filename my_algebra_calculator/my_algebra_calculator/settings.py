@@ -7,7 +7,7 @@ SECRET_KEY = 'django-insecure-r3w^#h=hv5q1i-4jr%$@+8&%hb5&_ni895e95$jhgs283n#i6l
 
 DEBUG = False
 
-ALLOWED_HOSTS = ['localhost', '127.0.0.1', 'calcx-kenaro-team.netlify.app/']
+ALLOWED_HOSTS = ["*"]
 
 
 INSTALLED_APPS = [
@@ -53,10 +53,20 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'my_algebra_calculator.wsgi.application'
 
+os.environ.setdefault("PGDATABASE", "dj_algebra")
+os.environ.setdefault("PGUSER", "postgres")
+os.environ.setdefault("PGPASSWORD", "Icantbelivethatsbutter72")
+os.environ.setdefault("PGHOST", "localhost")
+os.environ.setdefault("PGPORT", "5432")
+
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': os.environ["PGDATABASE"],
+        'USER': os.environ["PGUSER"],
+        'PASSWORD': os.environ["PGPASSWORD"],
+        'HOST': os.environ["PGHOST"],
+        'PORT': os.environ["PGPORT"],
     }
 }
 
@@ -89,4 +99,4 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'static_files')
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-CSRF_TRUSTED_ORIGINS = ['http://127.0.0.1', 'http://localhost:8000', 'https://calcx-kenaro-team.netlify.app/']
+CSRF_TRUSTED_ORIGINS = ['http://127.0.0.1', 'http://localhost:8000']
