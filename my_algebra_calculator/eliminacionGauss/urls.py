@@ -8,6 +8,7 @@ urlpatterns = [
     path('aboutU/', aboutU_view, name='aboutU_view'),
     path('generate_plot_data/', generate_plot_data, name='generate_plot_data'),
     path('product/', product_view, name='product_view'),
+    path('terms/', terms_view, name='terms_view'),
     #1
     path('all_gauss/', escalonar_view, name='escalonar_view'),  # Vista para Método Escalonado
     path('get-existing-ids/', get_existing_ids, name='get_existing_ids'),

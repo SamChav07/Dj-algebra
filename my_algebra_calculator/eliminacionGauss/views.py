@@ -32,6 +32,9 @@ def aboutU_view(request):
 def product_view(request):
     return render(request, 'services/product.html')
 
+def terms_view(request):
+    return render(request, 'services/terms.html')
+
 #1 Vista para la eliminación de Gauss
 def escalonar_view(request):
     form = ElimGaussForm()  

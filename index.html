@@ -1,0 +1,12 @@
+<ul class="navbar-nav flex-grow-1 justify-content-between">
+    <li class="nav-item"><a class="nav-link" href="{% url 'main' %}">Inicio</a></li>
+    <li class="nav-item dropdown">
+        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">Módulos</a>
+        <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+            <li><a class="dropdown-item" href="{% url "mainAlgebra_view" %}">Álgebra Lineal</a></li>
+            <li><a class="dropdown-item" href="#">Análisis Numérico</a></li>
+        </ul>
+    </li>
+    <li class="nav-item"><a class="nav-link" href="{% url "product_view" %}">CalcX</a></li>
+    <li class="nav-item"><a class="nav-link" href="{% url "aboutU_view" %}">Nosotros</a></li>
+</ul>
