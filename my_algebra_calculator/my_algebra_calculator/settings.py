@@ -7,7 +7,7 @@ SECRET_KEY = 'django-insecure-r3w^#h=hv5q1i-4jr%$@+8&%hb5&_ni895e95$jhgs283n#i6l
 
 DEBUG = False
 
-ALLOWED_HOSTS = ['127.0.0.1', 'localhost', 'upright-mole-enormous.ngrok-free.app', '.ngrok-free.app', '*']
+ALLOWED_HOSTS = ['.vercel.app','calcx-kt.vercel.app']
 
 
 INSTALLED_APPS = [
@@ -99,4 +99,4 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'static_files')
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-CSRF_TRUSTED_ORIGINS = ['http://127.0.0.1', 'http://localhost:8000', 'https://upright-mole-enormous.ngrok-free.app']
+CSRF_TRUSTED_ORIGINS = ['https://calcx-kt.vercel.app/']
