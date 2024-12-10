@@ -155,20 +155,14 @@
             </ul>
         </div>
 
-        <svg xmlns="http://www.w3.org/2000/svg" class="d-none">
-            <symbol id="aperture" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24">
-            <img src="{% static 'assets/calcXlogo.svg' %}" alt="Logo de calcX" style="width: 100%; height: 100px;">
-            </symbol>
-            <symbol id="chevron-right" viewBox="0 0 16 16">
-            <path fill-rule="evenodd" d="M4.646 1.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1 0 .708l-6 6a.5.5 0 0 1-.708-.708L10.293 8 4.646 2.354a.5.5 0 0 1 0-.708z"/>
-            </symbol>
-        </svg>
+        <a class="navbar-brand" href="{% url 'main' %}">
+            <img src="{% static 'assets/calcXlogo.svg' %}" alt="Logo de calcX" style="width: 100%; height: 110px;">
+        </a>
 
         <nav class="navbar navbar-expand-md bg-dark sticky-top border-bottom" data-bs-theme="dark">
             <div class="container">
                 <a class="navbar-brand d-md-none" href="#">
                     <svg class="bi" width="24" height="24"><use xlink:href="#aperture"/></svg>
-                    Aperture
                 </a>
                 <button class="navbar-toggler" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvas" aria-controls="offcanvas" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
@@ -176,7 +170,6 @@
                 
                 <div class="offcanvas offcanvas-end" tabindex="-1" id="offcanvas" aria-labelledby="offcanvasLabel">
                     <div class="offcanvas-header">
-                        <h5 class="offcanvas-title" id="offcanvasLabel">Aperture</h5>
                         <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
                     </div>
                     <div class="offcanvas-body">
@@ -188,14 +181,14 @@
                             </li>
                             <li class="nav-item"><a class="nav-link" href="{% url 'main' %}">Inicio</a></li>
                             <li class="nav-item dropdown">
-                                <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">Cursos</a>
+                                <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">Módulos</a>
                                 <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
-                                    <li><a class="dropdown-item" href="{% url "mainAlgebra_view" %}">Álgebra</a></li>
-                                    <li><a class="dropdown-item" href="#">Análisis</a></li>
+                                    <li><a class="dropdown-item" href="{% url "mainAlgebra_view" %}">Álgebra Lineal</a></li>
+                                    <li><a class="dropdown-item" href="#">Análisis Numérico</a></li>
                                 </ul>
                             </li>
-                            <li class="nav-item"><a class="nav-link" href="#">Product</a></li>
-                            <li class="nav-item"><a class="nav-link" href="{% url "aboutU_view" %}">About Us</a></li>
+                            <li class="nav-item"><a class="nav-link" href="{% url "product_view" %}">CalcX</a></li>
+                            <li class="nav-item"><a class="nav-link" href="{% url "aboutU_view" %}">Nosotros</a></li>
                         </ul>
                     </div>
                 </div>
@@ -208,9 +201,8 @@
         <main>
             <div class="position-relative overflow-hidden p-3 p-md-5 m-md-3 text-center bg-body-tertiary">
                 <div class="col-md-6 p-lg-5 mx-auto my-5">
-                    <h1 class="display-3 fw-bold">Analisis Numerico</h1>
-                    <h3 class="fw-normal text-muted mb-3">Solve complex algebraic problems effortlessly with calcX</h3>
-                    <div class="d-flex gap-3 justify-content-center lead fw-normal">
+                    <h1 class="display-3 fw-bold">Análisis Numérico</h1>
+                    <!--<div class="d-flex gap-3 justify-content-center lead fw-normal">
                         <a class="icon-link" href="#">
                         Discover more
                         <svg class="bi"><use xlink:href="#chevron-right"/></svg>
@@ -219,7 +211,7 @@
                         Get calcX
                         <svg class="bi"><use xlink:href="#chevron-right"/></svg>
                         </a>
-                    </div>
+                    </div>-->
                 </div>
                 <div class="product-device shadow-sm d-none d-md-block"></div>
                 <div class="product-device product-device-2 shadow-sm d-none d-md-block"></div>
@@ -229,8 +221,8 @@
                 <a href="{% url "bi_view" %}" class="text-decoration-none">
                     <div class="text-bg-dark me-md-3 pt-3 px-3 pt-md-5 px-md-5 text-center overflow-hidden">
                         <div class="my-3 py-3">
-                            <h2 class="display-5">Método Bisección</h2>
-                            <p class="lead">Una técnica sistemática para transformar la matriz del sistema en su forma escalonada por filas.</p>
+                            <h2 class="display-5">Método de Bisección</h2>
+                            <p class="lead">Método numérico para encontrar las raíces de una función dividiendo un intervalo en dos partes repetidamente.</p>
                         </div>
                         <div class="bg-body-tertiary shadow-sm mx-auto" style="width: 80%; height: 300px; border-radius: 21px 21px 0 0;"></div>
                     </div>
@@ -239,8 +231,8 @@
                 <a href="{% url "newRaphson_view" %}" class="text-decoration-none"> 
                     <div class="bg-body-tertiary me-md-3 pt-3 px-3 pt-md-5 px-md-5 text-center overflow-hidden">
                         <div class="my-3 p-3">
-                            <h2 class="display-5">Newton - Raphson</h2>
-                            <p class="lead">Formas de manipular y combinar vectores en álgebra lineal.</p>
+                            <h2 class="display-5">Método Newton - Raphson</h2>
+                            <p class="lead">Método iterativo para encontrar raíces de una función utilizando aproximaciones sucesivas basadas en derivadas.</p>
                         </div>
                         <div class="bg-dark shadow-sm mx-auto" style="width: 80%; height: 300px; border-radius: 21px 21px 0 0;"></div>
                     </div>
