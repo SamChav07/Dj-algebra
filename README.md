@@ -1,6 +1,6 @@
 # Dj-algebra
 
-![calcX Logo](https://github.com/SamChav07/Dj-algebra/my_algebra_calculator/static_files/assets/calcXlogo.svg)
+![calcX Logo](https://raw.githubusercontent.com/SamChav07/Dj-algebra/main/my_algebra_calculator/eliminacionGauss/staticsWeb/assets/calcXlogo.svg)
 
 Dj-algebra is an educational web platform developed in **Django** to explore, visualize, and solve classic problems in **Linear Algebra** and **Numerical Analysis**. Its interactive interface is designed for both students and educators, facilitating step-by-step learning of fundamental algorithms such as **Gaussian Elimination**, **Cramer's Rule**, **LU Factorization**, **Vector Operations**, and **Numerical Methods like Bisection**.
 
@@ -44,7 +44,7 @@ py -m venv algebraLineal
 ```bash
 pip install -r requirements.txt
 ```
-*(If you don't have `requirements.txt`, install at least: Django, SymPy, and NumPy)*
+*(Or install at least: Django, SymPy, and NumPy)*
 
 ### **3. Run the development server**
 ```bash
