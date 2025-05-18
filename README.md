@@ -1,69 +1,81 @@
 # Dj-algebra
 
-![calcX Logo](https://github.com/SamChav07/Dj-algebra/raw/main/my_algebra_calculator/eliminacionGauss/static/assets/calcXlogo.svg)
+![calcX Logo](https://github.com/SamChav07/Dj-algebra/my_algebra_calculator/eliminacionGauss/staticWeb/assets/calcXlogo.svg)
 
-## Current Modules
-- |-> Row Echelon Method  
-- |--> Combined Vector Operations  
-- |---> Row Vector × Column Vector Multiplication  
+Dj-algebra is an educational web platform developed in **Django** to explore, visualize, and solve classic problems in **Linear Algebra** and **Numerical Analysis**. Its interactive interface is designed for both students and educators, facilitating step-by-step learning of fundamental algorithms such as **Gaussian Elimination**, **Cramer's Rule**, **LU Factorization**, **Vector Operations**, and **Numerical Methods like Bisection**.
 
-## Installation
-The first step is to create the virtual environment:  
+---
 
-**MacOS**
+## 🚀 Current Modules
+
+✔️ **Linear Algebra**
+- Gaussian Elimination: Step-by-step transformation of matrices into row echelon form.
+- Cramer's Rule: Solving linear systems using determinants.
+- LU Factorization: Decomposing a matrix into L and U factors.
+- Inverse Matrix: Calculation using Gauss-Jordan elimination.
+- Determinant: Evaluation with the option to display intermediate steps.
+- Matrix × Vector Multiplication: Includes tests of distributive properties.
+- Matrix Operations: Addition, multiplication, transposition, and scaling.
+
+➕ **Vector Operations**
+- Linear Combinations: Calculation of scaled vector combinations.
+- Dot Product: Explanation and step-by-step development.
+
+📊 **Numerical Analysis**
+- **Bisection Method:** Finds function roots with detailed iteration reporting.
+
+---
+
+## ⚙️ Installation
+
+### **1. Create a virtual environment**
+#### MacOS / Linux
 ```bash
 python3 -m venv algebraLineal
+source algebraLineal/bin/activate
 ```
-
-**Windows**
+#### Windows
 ```bash
 py -m venv algebraLineal
+.\algebraLineal\Scripts\activate
 ```
 
-Then, activate the virtual environment:  
-Run `source algebraLineal/bin/activate`, and once activated, it will be displayed as `(algebraLineal)...$`.  
-
-Django can be installed via `pip3`:
+### **2. Install dependencies**
 ```bash
-python3 -m pip install Django
+pip install -r requirements.txt
 ```
+*(If you don't have `requirements.txt`, install at least: Django, SymPy, and NumPy)*
 
-### Running the Project
-1. Navigate to the `/my_algebra_calculator` folder.  
-2. Execute the following command:  
-
+### **3. Run the development server**
 ```bash
-# MacOS
-python3 manage.py runserver
-# Windows
-py manage.py runserver
+cd my_algebra_calculator
+python manage.py runserver
 ```
 
-At the end, the terminal will display a message similar to this:
+Once executed, the terminal will display a message similar to:
 ```bash
 Django version 5.1, using settings 'my_algebra_calculator.settings'
 Starting development server at http://127.0.0.1:8000/
 Quit the server with CONTROL-C.
 ```
-3. Access the default link `http://127.0.0.1:8000/`.
+🔗 **Access:** [http://127.0.0.1:8000/](http://127.0.0.1:8000/)
 
-> ***|--> Obviously, the server stops once it's terminated. To stop the local server, use `control + c` or `^C`.***
+---
 
-## Tables
+## 🧪 Module Examples
 
-### Row Echelon Method  
-**Input:**  
-- Equations Y  
-- Variables X  
-> ***A table is created with dimensions nY+1 and nX, where an additional column is added for the equation result.***  
+### **Gaussian Elimination**
+📌 **Input:** Augmented matrix of a linear system.  
+🔎 **Output:** Detailed steps of each row operation, pivot columns, final solution (unique, multiple, or nonexistent).  
 
-### Combined Vector Operations  
-**Input:**  
-- Number of vectors X  
-- Dimension of vectors Y  
-> ***Two tables are created: The first contains the vectors with a count of nX and components (Dimension) nY. The second table corresponds to the scalars, with vector nY and scalar nX.***  
+### **Combined Vector Operations**
+📌 **Input:** List of vectors and scalars.  
+🔎 **Output:** Result of the sum of scaled vectors, along with the formatted equation.  
 
-### Row Vector × Column Vector Multiplication  
-**Input:**  
-- Dimension of vector Y & X  
-> ***Two tables are created: The first is a row with nY = 1 and nX (Dimension). The second table is a column with nX = 1 and nY (Dimension).***  
+### **Matrix × Vector Multiplication**
+📌 **Input:** Matrix A and vectors u and v.  
+🔎 **Output:** Evaluation of the distributive property:  `A(u+v) = Au + Av.`
+
+### **Bisection Method**
+📌 **Input:** Mathematical function, interval `[a, b]`, tolerance.  
+🔎 **Output:** Approximate root with intermediate iteration reporting and convergence analysis.  
