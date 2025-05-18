@@ -1,62 +1,69 @@
 # Dj-algebra
 
-![Logo de calcX](https://github.com/SamChav07/Dj-algebra/raw/main/my_algebra_calculator/eliminacionGauss/static/assets/calcXlogo.svg)
+![calcX Logo](https://github.com/SamChav07/Dj-algebra/raw/main/my_algebra_calculator/eliminacionGauss/static/assets/calcXlogo.svg)
 
-## Modulos actuales
-- |-> Método Escalonado
-- |--> Operaciones Combinadas de Vectores 
-- |---> Multiplicación Vector fila por columna
+## Current Modules
+- |-> Row Echelon Method  
+- |--> Combined Vector Operations  
+- |---> Row Vector × Column Vector Multiplication  
 
-## Instalación 
-El primer paso es crear el entorno virtual:
-**MacOs**
-```
+## Installation
+The first step is to create the virtual environment:  
+
+**MacOS**
+```bash
 python3 -m venv algebraLineal
 ```
+
 **Windows**
-```
+```bash
 py -m venv algebraLineal
 ```
 
-Luego se debe de activar el Venv: `source algebraLineal/bin/activate`, una vez activado se mostrará de esta manera `(algebraLineal)...$`.
-Django se puede instalar por medio del `pip3`:
-```
+Then, activate the virtual environment:  
+Run `source algebraLineal/bin/activate`, and once activated, it will be displayed as `(algebraLineal)...$`.  
+
+Django can be installed via `pip3`:
+```bash
 python3 -m pip install Django
 ```
-### Ejecución del proyecto
-1. Acceder a la carpeta `/my_algebra_calculator`
-2. Ejecutar el siguiente comando:
-```
-# mOs
+
+### Running the Project
+1. Navigate to the `/my_algebra_calculator` folder.  
+2. Execute the following command:  
+
+```bash
+# MacOS
 python3 manage.py runserver
-# Wnds
+# Windows
 py manage.py runserver
 ```
-Al final del mensaje en la terminal aparecerá un mensaje similar a este:
-```
+
+At the end, the terminal will display a message similar to this:
+```bash
 Django version 5.1, using settings 'my_algebra_calculator.settings'
 Starting development server at http://127.0.0.1:8000/
 Quit the server with CONTROL-C.
 ```
-3. Debes de acceder al link por default `http://127.0.0.1:8000/`
+3. Access the default link `http://127.0.0.1:8000/`.
 
-> ***|--> Obviamente el servidor se cae una vez detenido. Para detener el servidor local se usa `control + c` o `^C`***
+> ***|--> Obviously, the server stops once it's terminated. To stop the local server, use `control + c` or `^C`.***
 
-## Tablas
+## Tables
 
-### Método Escalonado
-Input:
-- Ecuaciones Y
-- Variables X
-> ***Se crea una tabla de nY+1 y nX, donde se le suma una columna de resultado de la ecuación.***
+### Row Echelon Method  
+**Input:**  
+- Equations Y  
+- Variables X  
+> ***A table is created with dimensions nY+1 and nX, where an additional column is added for the equation result.***  
 
-### Operaciones Combinadas de Vectores
-Input: 
-- Numero de Vectores X
-- Dimension de vectores Y
-> ***Se crean dos tablas, la primera es de vectores con el numero de vectores nX y componentes(Dimension) nY, la segunda tabla corresponde a los escalares vector nY escalar nX.*** 
+### Combined Vector Operations  
+**Input:**  
+- Number of vectors X  
+- Dimension of vectors Y  
+> ***Two tables are created: The first contains the vectors with a count of nX and components (Dimension) nY. The second table corresponds to the scalars, with vector nY and scalar nX.***  
 
-### Multiplicación de Vector Fila x Vector Columna
-Input:
-- Dimension del vector Y & X
-> ***Crea dos tablas, la primera una fila nY = 1 y nX(Dimension), la segunda tabla es una columna nX = 1 y nY(Dimension).***
+### Row Vector × Column Vector Multiplication  
+**Input:**  
+- Dimension of vector Y & X  
+> ***Two tables are created: The first is a row with nY = 1 and nX (Dimension). The second table is a column with nX = 1 and nY (Dimension).***  
